@@ -8,6 +8,8 @@ Read relevant source, callers, project configuration and related `task/` notes b
 
 Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
+The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`; `github` retains the previous GitHub remote. GitLab is private. Existing GitHub releases and Actions runs remain historical download and verification sources; GitLab CI and releases are not yet configured. Do not replace working release links with unverified GitLab links.
+
 ## Architecture
 
 - `LunaArc.sln`: Core, Shell, CLI, Studio and the smoke-check executable.
@@ -21,7 +23,7 @@ Discuss work in Vietnamese when appropriate; keep source comments, UI messages, 
 - `tests/LunaArc.StudioChecks`: headless Skia rendering and interaction checks for the actual Avalonia views, with PNG captures.
 - `installers`: self-contained publish scripts, versioned Windows portable ZIP/setup packaging, Inno Setup definition and CI-only installer lifecycle checks.
 - `branding`: logo and EULA; `native_libs`: optional-library notes, not an implemented native adapter.
-- `.github/workflows/build.yml`: native Windows/Linux verification and artifact publishing in CI.
+- `.github/workflows/build.yml`: GitHub Actions configuration for native Windows/Linux verification and artifact publishing; it does not run on GitLab.
 - `.github/workflows/release.yml`: explicitly dispatched promotion of a successful main-branch build to versioned GitHub Release assets. Never rebuild or overwrite an existing release; verify Windows checksums before promotion and include SHA-256 for all three release packages.
 
 Current dependencies: SharpCompress 0.50.5, SharpZipLib 1.4.2 (encrypted ZIP writing), ZstdSharp.Port 0.8.7, Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Check `.csproj` for the actual versions. Upgrade only when needed by the task and verify affected APIs and archive fixtures.

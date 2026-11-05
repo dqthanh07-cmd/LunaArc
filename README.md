@@ -4,6 +4,8 @@
 
 LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend.
 
+The primary source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaarc). It is private and requires access; the existing 2.3.0 downloads and verified builds remain hosted on GitHub. GitLab CI and releases have not yet been configured.
+
 ## Download
 
 Version **2.3.0** adds estimated free-space checks, progress by phase with measured throughput/ETA, and automatic final-file extraction for `.tar.gz.7z`. Includes authenticated LARC v2, LunaArc split sets, Nocturne Orbit and optional Windows 11 main-menu setup with explicit certificate consent. Native Windows/Linux builds passed 431/433 archive checks and 180 rendered UI checks per OS, published password/SFX/split-set checks and Windows Setup/Portable lifecycle checks. Download the [published release](https://github.com/lunavibe07/LunaArc/releases/tag/v2.3.0), built from the [verified source run](https://github.com/lunavibe07/LunaArc/actions/runs/38822333666).
@@ -58,7 +60,7 @@ Version **1.4.5** replaces the logo with the supplied moon-and-sun infinity artw
 - **Find** / **F3** filters names in the current folder without changing archive contents. Size columns sort by numeric byte counts.
 - **Archive info** shows the current archive path, folder/file summary and available comment. **Options** opens compression/password settings; cancelling restores the previous settings.
 - **File** includes close archive and exit; **Tools** contains context-menu installation. **Ctrl+O** opens an archive.
-- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitHub)** opens [the LunaArc repository](https://github.com/lunavibe07/LunaArc) in your default browser. **Help > About LunaArc** displays the application version and logo.
+- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitLab)** opens [the LunaArc repository](https://gitlab.com/itmylifeex/lunaarc) in your default browser. **Help > About LunaArc** displays the application version and logo.
 
 The **Help Topics** window has a classic two-pane layout. Choose a topic in Contents/Index, enter a word in Search, or follow a related-topic link below an article. **Add favorite / Remove favorite** saves only topic IDs in the current user's `LunaArc/help-favorites.json` under the OS local application-data directory. **Hide navigation** expands the article; **Show navigation** restores the tabs. The guide is embedded in the application and needs no internet or Windows CHM viewer, so the same help works on Windows and Linux. It documents current capabilities and limits, including ZIP file-name visibility and automatic two-layer extraction for encrypted TAR GZip.
 
