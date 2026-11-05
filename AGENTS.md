@@ -4,7 +4,9 @@
 
 Build and maintain LunaArc, a .NET 8 archive application for Windows and Linux. Prioritize correctness and preservation of user data, security, maintainability, simplicity, then performance. Keep source comments, UI messages, CLI output and documentation in English, encoded as UTF-8.
 
-Read relevant source before editing. Source and project files define current behavior; README claims and comments are not proof that a feature or performance target has been verified.
+Read relevant source, callers, project configuration and related `task/` notes before editing. Source and project files define current behavior; README claims and comments are not proof that a feature or performance target has been verified. Recheck the version-specific facts below against the current code before relying on them.
+
+Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
 ## Architecture
 
@@ -114,7 +116,7 @@ Build Windows setup/portable packages via `installers/build_windows_packages.ps1
 ## Artifacts, change logs and reports
 
 - Ignore `bin/`, `obj/`, `dist/`, `.tools/`, temporary archives/parts and private user configuration unless a fixture/release purpose is explicit.
-- For code, configuration or documentation changes, create/update `task/change-logs/YYYYMMDD-HHMMSS-short-description.md` using the user's session timezone.
+- For code, configuration or documentation changes, create/update `task/change-logs/YYYYMMDD-HHMMSS-short-description.md` using the user's session timezone. Prefer an existing relevant note when appropriate; record actual evidence and distinguish hypotheses from verified causes.
 - Keep `task/` local and ignored by Git. Never stage or upload task notes; the project owner explicitly requested this.
 - Include request, affected files, before/after behavior, root cause when applicable, actual checks/evidence, limitations/risks and release status.
 - Do not upload, sign, deploy or publicly release artifacts outside the requested scope.
