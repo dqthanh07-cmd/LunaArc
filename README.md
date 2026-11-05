@@ -4,7 +4,7 @@
 
 LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend.
 
-The primary source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaarc). It is private and requires access; the existing 2.3.0 downloads and verified builds remain hosted on GitHub. GitLab CI and releases have not yet been configured.
+The primary source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaarc). It is public; the existing 2.3.0 downloads and verified builds remain hosted on GitHub. GitLab CI and releases have not yet been configured.
 
 ## Download
 

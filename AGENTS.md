@@ -8,7 +8,7 @@ Read relevant source, callers, project configuration and related `task/` notes b
 
 Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
-The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`; `github` retains the previous GitHub remote. GitLab is private. Existing GitHub releases and Actions runs remain historical download and verification sources; GitLab CI and releases are not yet configured. Do not replace working release links with unverified GitLab links.
+The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`; `github` retains the previous GitHub remote. The GitLab repository is public. Existing GitHub releases and Actions runs remain historical download and verification sources; GitLab CI and releases are not yet configured. Do not replace working release links with unverified GitLab links.
 
 ## Architecture
 
