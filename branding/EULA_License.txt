@@ -1,8 +1,8 @@
 LUNAARC ARCHIVER - END USER LICENSE AGREEMENT (EULA)
-Copyright (c) 2026 LunaArc Software. All rights reserved.
+Copyright (c) 2026 LunaCompany.
 
-1. PROPRIETARY RIGHTS
-LunaArc Archiver and the ".larc" archive specification are proprietary products of LunaArc Software.
+1. OPEN-SOURCE LICENSE
+The LunaArc Archiver source code is licensed under the MIT License included in the project repository. Third-party components and bundled materials retain their own licenses, listed below and in their accompanying notices.
 
 2. THIRD-PARTY OPEN SOURCE NOTICES
 - SharpCompress (MIT License)

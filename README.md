@@ -2,7 +2,7 @@
 
 <img src="branding/app_logo_256.png" alt="LunaArc logo" width="96" height="96" />
 
-LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend.
+LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend. LunaArc source code is licensed under the [MIT License](LICENSE); third-party components retain their own licenses.
 
 The source repository is [LunaArc on GitHub](https://github.com/dqthanh07-cmd/LunaArc). GitHub Actions verifies native Windows and Linux builds. Versioned downloads are published as GitHub Releases after a successful default-branch build is manually promoted.
 

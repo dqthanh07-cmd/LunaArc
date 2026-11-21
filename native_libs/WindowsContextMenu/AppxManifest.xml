@@ -9,7 +9,7 @@
  IgnorableNamespaces="uap uap10 com desktop4 desktop5 rescap">
  <Identity Name="LunaArc.ShellMenu" Publisher="CN=LunaArc Shell Menu Preview" Version="1.3.0.0" ProcessorArchitecture="x64"/>
  <Properties>
-  <DisplayName>LunaArc</DisplayName><PublisherDisplayName>LunaArc Software</PublisherDisplayName>
+  <DisplayName>LunaArc</DisplayName><PublisherDisplayName>LunaCompany</PublisherDisplayName>
   <Logo>Assets\Logo.png</Logo><uap10:AllowExternalContent>true</uap10:AllowExternalContent>
  </Properties>
  <Resources><Resource Language="en-us"/></Resources>

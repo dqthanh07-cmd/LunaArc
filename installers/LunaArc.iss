@@ -13,7 +13,7 @@
 AppId=LunaArc.Archiver.Windows
 AppName=LunaArc Archiver
 AppVersion={#AppVersion}
-AppPublisher=LunaArc Software
+AppPublisher=LunaCompany
 AppPublisherURL=https://github.com/dqthanh07-cmd/LunaArc
 AppSupportURL=https://github.com/dqthanh07-cmd/LunaArc/issues
 DefaultDirName={localappdata}\Programs\LunaArc
