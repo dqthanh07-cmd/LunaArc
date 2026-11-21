@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:LunaArc.Studio.ViewModels" x:Class="LunaArc.Studio.Views.ArchiveOptionsWindow"
  x:DataType="vm:CompressionOptionsViewModel" Title="Archive name and parameters - LunaArc"
  Width="630" Height="710" MinWidth="600" MinHeight="670" RequestedThemeVariant="Dark"
@@ -27,6 +27,7 @@
           <RadioButton Name="LarcFormatRadio" GroupName="Format" Content="LARC (.larc)" IsChecked="{Binding IsLarc}"/>
           <RadioButton Name="ZipFormatRadio" GroupName="Format" Content="ZIP (.zip)" IsChecked="{Binding IsZip}"/>
           <RadioButton Name="TarFormatRadio" GroupName="Format" Content="TAR GZip (.tar.gz)" IsChecked="{Binding IsTarGzip}"/>
+          <RadioButton Name="TarZstFormatRadio" GroupName="Format" Content="TAR Zstd (.tar.zst)" IsChecked="{Binding IsTarZst}"/>
           <RadioButton Name="SevenZipFormatRadio" GroupName="Format" Content="7z (.7z)" IsChecked="{Binding IsSevenZip}"/>
          </StackPanel>
         </Border>
@@ -37,11 +38,11 @@
           <ComboBoxItem Content="Normal"/><ComboBoxItem Content="Good"/><ComboBoxItem Content="Best"/>
          </ComboBox>
         </StackPanel>
-      <StackPanel IsVisible="{Binding IsCreation}" Spacing="4">
-       <TextBlock Text="Split to volumes, size (MiB)"/>
-       <TextBox Name="SplitSizeBox" Text="{Binding SplitSizeMiB}" Watermark="Leave blank for a single archive"/>
-       <TextBlock Text="Open .001; keep every part and its manifest. Requires temporary disk space." TextWrapping="Wrap" FontSize="11"/>
-      </StackPanel>
+       <StackPanel IsVisible="{Binding IsCreation}" Spacing="4">
+        <TextBlock Text="Split to volumes, size (MiB)"/>
+        <TextBox Name="SplitSizeBox" Text="{Binding SplitSizeMiB}" Watermark="Leave blank for a single archive"/>
+        <TextBlock Text="Open .001; keep every part and its manifest. Requires temporary disk space." TextWrapping="Wrap" FontSize="11"/>
+       </StackPanel>
         <TextBlock Text="{Binding FormatNote}" TextWrapping="Wrap" Foreground="#BDBDBD"/>
         <TextBlock Text="Deletion is off by default. It forces testing and uses temporary extraction space. Changed or unarchived sources are kept." Foreground="#BDBDBD" TextWrapping="Wrap"/>
        </StackPanel>

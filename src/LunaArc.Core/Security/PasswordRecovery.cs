@@ -60,6 +60,22 @@ public static class PasswordRecovery
         }
     }
 
+    public static async Task<List<string>> LoadWordlistAsync(string filePath, CancellationToken ct = default)
+    {
+        if (!File.Exists(filePath)) throw new FileNotFoundException("Wordlist file not found.", filePath);
+        var list = new List<string>();
+        using var reader = new StreamReader(filePath);
+        string? line;
+        while ((line = await reader.ReadLineAsync(ct)) != null)
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            list.Add(line.Trim());
+            if (list.Count > MaximumCandidates)
+                throw new ArgumentException($"The wordlist exceeds the {MaximumCandidates:N0}-candidate limit.");
+        }
+        return list;
+    }
+
     public static async Task<RecoveryResult> SearchAsync(IEnumerable<string> candidates, long total,
         Func<string, CancellationToken, Task<bool>> verify, LunaJobController controller,
         IProgress<RecoveryProgress>? progress = null)

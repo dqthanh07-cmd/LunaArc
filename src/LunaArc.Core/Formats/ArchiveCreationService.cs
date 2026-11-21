@@ -16,6 +16,8 @@ public static class ArchiveCreationService
             throw new ArgumentException("Split sets require at least 64 KiB per part and cannot combine with SFX, recovery records, locks or source deletion.");
         if (options.Format == OutputArchiveFormat.EncryptedTarGz && options.DeleteSourceAfterArchiving)
             throw new NotSupportedException("Source deletion is not supported for the nested TAR GZip encryption wrapper. Sources were preserved.");
+        if (options.Format == OutputArchiveFormat.TarZst && !string.IsNullOrEmpty(options.Password))
+            throw new NotSupportedException("TAR Zstandard does not support encryption. Use LARC, ZIP or 7z for password protection.");
         ArchiveLock.EnsureWritable(output);
         foreach (string path in new[] { output, ArchiveRecoveryRecord.RecordPath(output), ArchiveLock.RecordPath(output) })
             if (File.Exists(path) || Directory.Exists(path)) throw new IOException("An output or companion file already exists. Choose a new archive name.");
@@ -29,7 +31,15 @@ public static class ArchiveCreationService
         string directory = Path.GetDirectoryName(output)!;
         CreationSpaceEstimate.Check(sources, options, sfx, recovery, test || options.DeleteSourceAfterArchiving || options.SplitVolumeSizeBytes.HasValue, job);
         Directory.CreateDirectory(directory);
-        string extension = options.Format switch { OutputArchiveFormat.Zip => ".zip", OutputArchiveFormat.TarGz => ".tar.gz", OutputArchiveFormat.EncryptedTarGz => ".tar.gz.7z", OutputArchiveFormat.SevenZip => ".7z", _ => ".larc" };
+        string extension = options.Format switch
+        {
+            OutputArchiveFormat.Zip => ".zip",
+            OutputArchiveFormat.TarGz => ".tar.gz",
+            OutputArchiveFormat.TarZst => ".tar.zst",
+            OutputArchiveFormat.EncryptedTarGz => ".tar.gz.7z",
+            OutputArchiveFormat.SevenZip => ".7z",
+            _ => ".larc"
+        };
         string temporary = Path.Combine(directory, ".lunaarc-" + Guid.NewGuid().ToString("N") + extension);
         string executable = temporary + ".sfx";
         string record = temporary + ".lrec";

@@ -1,0 +1,133 @@
+stages:
+  - verify
+  - release
+
+variables:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  # Keep this in sync with Directory.Build.props before promoting a release.
+  LUNAARC_RELEASE_TAG: "v2.3.0"
+  LUNAARC_RELEASE_VERSION: "2.3.0"
+
+verify:linux:
+  stage: verify
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  tags:
+    - saas-linux-small-amd64
+  script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends python3 xvfb
+    - dotnet restore LunaArc.sln
+    - bash installers/prepare_sevenzip.sh "$CI_PROJECT_DIR/.tools/check-encoder"
+    - export LUNAARC_7ZIP_PATH="$CI_PROJECT_DIR/.tools/check-encoder/LunaArc.7zz"
+    - dotnet build LunaArc.sln -c Debug --no-restore
+    - dotnet build LunaArc.sln -c Release --no-restore
+    - LUNAARC_LARGE_CHECKS=1 dotnet run --project tests/LunaArc.SmokeTests -c Release --no-build
+    - python3 installers/test_prepare_release.py
+    - dotnet run --project tests/LunaArc.StudioChecks -c Release --no-build -- dist/ui-preview/linux-x64
+    - bash installers/build_linux.sh
+    - ./dist/linux-x64/luna-cli help
+    - python3 installers/test_advanced_packages.py dist/linux-x64
+    - mkdir -p release-input/linux
+    - cp -a dist/linux-x64/. release-input/linux/
+  artifacts:
+    when: on_success
+    expire_in: 1 year
+    paths:
+      - release-input/linux/
+      - dist/ui-preview/linux-x64/*.png
+
+verify:windows:
+  stage: verify
+  tags:
+    - saas-windows-medium-amd64
+  script:
+    - |
+      $ErrorActionPreference = 'Stop'
+      dotnet restore LunaArc.sln
+      if ($LASTEXITCODE -ne 0) { throw 'Restore failed.' }
+      ./installers/prepare_sevenzip.ps1 -OutputDirectory .tools/check-encoder -Runtime win-x64
+      $env:LUNAARC_7ZIP_PATH = (Resolve-Path .tools/check-encoder/LunaArc.7zr.exe).Path
+      dotnet build LunaArc.sln -c Debug --no-restore
+      if ($LASTEXITCODE -ne 0) { throw 'Debug build failed.' }
+      dotnet build LunaArc.sln -c Release --no-restore
+      if ($LASTEXITCODE -ne 0) { throw 'Release build failed.' }
+      $env:LUNAARC_LARGE_CHECKS = '1'
+      dotnet run --project tests/LunaArc.SmokeTests -c Release --no-build
+      if ($LASTEXITCODE -ne 0) { throw 'Archive smoke checks failed.' }
+      python installers/test_prepare_release.py
+      if ($LASTEXITCODE -ne 0) { throw 'Release packaging checks failed.' }
+      dotnet run --project tests/LunaArc.StudioChecks -c Release --no-build -- dist/ui-preview/win-x64
+      if ($LASTEXITCODE -ne 0) { throw 'Studio checks failed.' }
+      ./installers/build_windows.ps1
+      if ($LASTEXITCODE -ne 0) { throw 'Windows publish failed.' }
+      ./dist/win-x64/luna-cli.exe help
+      if ($LASTEXITCODE -ne 0) { throw 'Published CLI check failed.' }
+      python installers/test_advanced_packages.py dist/win-x64
+      if ($LASTEXITCODE -ne 0) { throw 'Advanced package checks failed.' }
+      if (-not (Get-Command ISCC.exe -ErrorAction SilentlyContinue)) { choco install innosetup --no-progress -y }
+      ./installers/build_windows_packages.ps1 -SkipPublish
+      if ($LASTEXITCODE -ne 0) { throw 'Windows packages failed.' }
+      ./installers/test_windows_packages.ps1
+      if ($LASTEXITCODE -ne 0) { throw 'Installer lifecycle checks failed.' }
+      $version = [string]([xml](Get-Content Directory.Build.props -Raw)).Project.PropertyGroup.Version
+      New-Item -ItemType Directory -Path release-input/LunaArc-Windows-Setup,release-input/LunaArc-Windows-Portable,release-input/LunaArc-Windows-Checksums -Force | Out-Null
+      Copy-Item "dist/packages/LunaArc-$version-setup-win-x64.exe" release-input/LunaArc-Windows-Setup/
+      Copy-Item "dist/packages/LunaArc-$version-portable-win-x64.zip" release-input/LunaArc-Windows-Portable/
+      Copy-Item dist/packages/SHA256SUMS.txt release-input/LunaArc-Windows-Checksums/
+  artifacts:
+    when: on_success
+    expire_in: 1 year
+    paths:
+      - release-input/LunaArc-Windows-Setup/
+      - release-input/LunaArc-Windows-Portable/
+      - release-input/LunaArc-Windows-Checksums/
+      - dist/ui-preview/win-x64/*.png
+
+release:verified:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/cli:v1.59.1
+  resource_group: gitlab-release
+  tags:
+    - saas-linux-small-amd64
+  needs:
+    - job: verify:linux
+      artifacts: true
+    - job: verify:windows
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      when: manual
+    - when: never
+  allow_failure: false
+  script:
+    - apk add --no-cache curl
+    - |
+      set -eu
+      VERSION="$(python -c "import xml.etree.ElementTree as E; print(E.parse('Directory.Build.props').findtext('.//Version'))")"
+      test "$LUNAARC_RELEASE_TAG" = "v$VERSION" && test "$LUNAARC_RELEASE_VERSION" = "$VERSION" || { echo "Release variables must match Directory.Build.props (v$VERSION)." >&2; exit 1; }
+      python installers/prepare_release.py release-input release-assets
+      python installers/publish_gitlab_release.py release-assets
+  release:
+    tag_name: "$LUNAARC_RELEASE_TAG"
+    ref: "$CI_COMMIT_SHA"
+    name: "LunaArc $LUNAARC_RELEASE_TAG"
+    description: "Verified Windows and Linux packages. Check downloads against SHA256SUMS.txt. Windows 11 main-menu integration uses a preview signing certificate and requires explicit trust consent."
+    assets:
+      links:
+        - name: "Windows Setup"
+          url: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/lunaarc/$LUNAARC_RELEASE_TAG/LunaArc-$LUNAARC_RELEASE_VERSION-setup-win-x64.exe"
+          filepath: "/downloads/LunaArc-Windows-Setup.exe"
+          link_type: package
+        - name: "Windows Portable"
+          url: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/lunaarc/$LUNAARC_RELEASE_TAG/LunaArc-$LUNAARC_RELEASE_VERSION-portable-win-x64.zip"
+          filepath: "/downloads/LunaArc-Windows-Portable.zip"
+          link_type: package
+        - name: "Linux x64"
+          url: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/lunaarc/$LUNAARC_RELEASE_TAG/LunaArc-$LUNAARC_RELEASE_VERSION-linux-x64.tar.gz"
+          filepath: "/downloads/LunaArc-Linux-x64.tar.gz"
+          link_type: package
+        - name: "SHA-256 checksums"
+          url: "https://gitlab.com/api/v4/projects/$CI_PROJECT_ID/packages/generic/lunaarc/$LUNAARC_RELEASE_TAG/SHA256SUMS.txt"
+          filepath: "/downloads/SHA256SUMS.txt"
+          link_type: other

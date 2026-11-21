@@ -5,6 +5,7 @@ using Avalonia.Platform.Storage;
 using LunaArc.Studio.ViewModels;
 using LunaArc.Shell;
 using LunaArc.Core.Contracts;
+using LunaArc.Core.Formats;
 using Avalonia.Threading;
 
 namespace LunaArc.Studio.Views;
@@ -17,6 +18,8 @@ public partial class MainWindow : Window
         this.FindControl<MenuItem>("Windows11MenuItem")!.IsVisible = Windows11MenuInstaller.IsSupported;
         SizeChanged += (_, _) => UpdateResponsiveLayout();
         Closed += (_, _) => Vm?.Dispose();
+        AddHandler(DragDrop.DropEvent, OnWindowDrop);
+        AddHandler(DragDrop.DragOverEvent, OnWindowDragOver);
     }
 
     private MainWindowViewModel? Vm => DataContext as MainWindowViewModel;
@@ -145,7 +148,7 @@ public partial class MainWindow : Window
             {
                 new FilePickerFileType("Supported archives")
                 {
-                    Patterns = new[] { "*.larc", "*.001", "*.rar", "*.7z", "*.zip", "*.tar", "*.gz", "*.bz2", "*.xz" }
+                    Patterns = new[] { "*.larc", "*.001", "*.rar", "*.7z", "*.zip", "*.tar", "*.gz", "*.bz2", "*.xz", "*.iso" }
                 }
             }
         });
@@ -220,6 +223,28 @@ public partial class MainWindow : Window
         if (await options.ShowDialog<bool>(this)) await Vm.CompressFilesToArchiveAsync(inPaths, options.OutputPath);
     }
 
+    private void OnWindowDragOver(object? sender, DragEventArgs e)
+    {
+        e.DragEffects = e.Data.Contains(DataFormats.Files) ? DragDropEffects.Copy : DragDropEffects.None;
+    }
+
+    private async void OnWindowDrop(object? sender, DragEventArgs e)
+    {
+        if (Vm == null || Vm.IsBusy) return;
+        var files = e.Data.GetFiles()?.Select(f => f.TryGetLocalPath()).Where(p => !string.IsNullOrEmpty(p)).Cast<string>().ToArray();
+        if (files == null || files.Length == 0) return;
+
+        if (files.Length == 1 && File.Exists(files[0]) && StandardArchiveHandler.IsSupportedArchive(files[0]))
+        {
+            await Vm.OpenArchiveFileAsync(files[0]);
+        }
+        else
+        {
+            var options = new ArchiveOptionsWindow(Vm, files);
+            if (await options.ShowDialog<bool>(this)) await Vm.CompressFilesToArchiveAsync(files, options.OutputPath);
+        }
+    }
+
     private async void OnItemDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (Vm != null)
@@ -279,12 +304,37 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (!await Launcher.LaunchUriAsync(new Uri("https://gitlab.com/itmylifeex/lunaarc")) && Vm != null)
-                Vm.StatusMessage = "Could not open the project home page. Visit https://gitlab.com/itmylifeex/lunaarc";
+            if (!await Launcher.LaunchUriAsync(new Uri("https://gitlab.com/lunadevai-group/lunaarc")) && Vm != null)
+                Vm.StatusMessage = "Could not open the project home page. Visit https://gitlab.com/lunadevai-group/lunaarc";
         }
         catch (Exception ex)
         {
             if (Vm != null) Vm.StatusMessage = "Could not open the project home page: " + ex.Message;
+        }
+    }
+
+    private async void OnCheckForUpdatesClicked(object? sender, RoutedEventArgs e)
+    {
+        if (Vm == null || Vm.IsBusy) return;
+        try
+        {
+            var result = await Vm.CheckForUpdatesAsync();
+            if (!result.UpdateAvailable)
+            {
+                await ShowInformationAsync("Check for updates", "LunaArc is up to date",
+                    $"You are using LunaArc {result.CurrentVersion.ToString(3)}, the latest published version.");
+                return;
+            }
+
+            string notes = string.IsNullOrWhiteSpace(result.ReleaseNotes) ? "No release notes were provided." : result.ReleaseNotes;
+            await ShowInformationAsync("Update available", $"LunaArc {result.LatestVersion} is available",
+                $"Installed version: {result.CurrentVersion.ToString(3)}\n\n{notes}\n\nThe GitLab release page will open after you close this message. Choose the package for your operating system there.");
+            if (!await Launcher.LaunchUriAsync(result.ReleasePage))
+                Vm.StatusMessage = $"Could not open the release page. Visit {result.ReleasePage}";
+        }
+        catch (Exception ex)
+        {
+            await ShowInformationAsync("Update check failed", "Could not check for updates", ex.Message);
         }
     }
 

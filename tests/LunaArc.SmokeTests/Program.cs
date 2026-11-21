@@ -238,7 +238,16 @@ try
     using (var job = new LunaJobController())
     {
         await ExpectFailure(() => backend.CompressAsync(new[] { source }, new CompressOptions
-        { OutputArchivePath = Path.Combine(root, "unsupported.tar.zst"), Format = OutputArchiveFormat.TarZst }, job), "Unsupported TAR Zstandard output is rejected");
+        { OutputArchivePath = Path.Combine(root, "password.tar.zst"), Format = OutputArchiveFormat.TarZst, Password = "fixture" }, job), "Native TAR Zstandard encryption is rejected");
+        string tarzstPath = Path.Combine(root, "supported.tar.zst");
+        await backend.CompressAsync(new[] { source }, new CompressOptions
+        { OutputArchivePath = tarzstPath, Format = OutputArchiveFormat.TarZst }, job);
+        Check(File.Exists(tarzstPath), "TAR Zstandard archive is created");
+        var tarzstTest = await backend.TestArchiveAsync(tarzstPath, null, job);
+        Check(tarzstTest.IsHealthy && tarzstTest.TotalFilesTested == 4, "TAR Zstandard archive passes integrity test");
+        string tarzstExtractDir = Path.Combine(root, "tarzst-extract");
+        await backend.ExtractAsync(tarzstPath, new ExtractOptions { DestinationDirectory = tarzstExtractDir }, job);
+        Check(File.Exists(Path.Combine(tarzstExtractDir, "fixture with spaces", "hello.txt")), "TAR Zstandard archive extracts successfully");
         await ExpectFailure(() => backend.CompressAsync(new[] { source }, new CompressOptions
         { OutputArchivePath = Path.Combine(root, "password.tar.gz"), Format = OutputArchiveFormat.TarGz, Password = "fixture" }, job), "Native TAR GZip encryption is rejected");
         Check(!File.Exists(Path.Combine(root, "password.tar.gz")), "Rejected TAR encryption creates no archive");

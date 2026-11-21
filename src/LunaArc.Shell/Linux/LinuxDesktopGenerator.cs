@@ -1,7 +1,7 @@
 namespace LunaArc.Shell.Linux;
 
 /// <summary>
-/// Creates a desktop launcher and Nautilus scripts for the current Linux user.
+/// Creates a desktop launcher, Nautilus scripts and KDE Dolphin service menus for the current Linux user.
 /// </summary>
 public sealed class LinuxDesktopGenerator : IOsShellRegistrar
 {
@@ -33,7 +33,7 @@ public sealed class LinuxDesktopGenerator : IOsShellRegistrar
             $"Icon={icon}",
             "Terminal=false",
             "Categories=Utility;Archiving;Compression;",
-            "MimeType=application/zip;application/vnd.rar;application/x-7z-compressed;application/x-tar;application/gzip;",
+            "MimeType=application/zip;application/vnd.rar;application/x-7z-compressed;application/x-tar;application/gzip;application/zstd;",
             ""
         }));
 
@@ -41,6 +41,29 @@ public sealed class LinuxDesktopGenerator : IOsShellRegistrar
         Directory.CreateDirectory(scriptsDir);
         WriteScript(Path.Combine(scriptsDir, "LunaArc - Extract Here"), cliExecutablePath, "extract-here");
         WriteScript(Path.Combine(scriptsDir, "LunaArc - Create .larc Archive"), cliExecutablePath, "pack-larc");
+
+        string dolphinDir = Path.Combine(UserDataRoot, "kio", "servicemenus");
+        Directory.CreateDirectory(dolphinDir);
+        File.WriteAllText(Path.Combine(dolphinDir, "lunaarc.desktop"), string.Join('\n', new[]
+        {
+            "[Desktop Entry]",
+            "Type=Service",
+            "ServiceTypes=KonqPopupMenu/Plugin",
+            "MimeType=application/zip;application/vnd.rar;application/x-7z-compressed;application/x-tar;application/gzip;application/zstd;",
+            "Actions=extractHere;packLarc;",
+            "X-KDE-Priority=TopLevel",
+            "",
+            "[Desktop Action extractHere]",
+            "Name=LunaArc - Extract Here",
+            "Icon=archive-extract",
+            $"Exec={QuoteDesktopArgument(cliExecutablePath)} extract-here %f",
+            "",
+            "[Desktop Action packLarc]",
+            "Name=LunaArc - Create .larc Archive",
+            "Icon=archive-insert",
+            $"Exec={QuoteDesktopArgument(cliExecutablePath)} pack-larc %f",
+            ""
+        }));
     }
 
     public void UnregisterAll()
@@ -51,7 +74,8 @@ public sealed class LinuxDesktopGenerator : IOsShellRegistrar
         {
             "applications/lunaarc.desktop",
             "nautilus/scripts/LunaArc - Extract Here",
-            "nautilus/scripts/LunaArc - Create .larc Archive"
+            "nautilus/scripts/LunaArc - Create .larc Archive",
+            "kio/servicemenus/lunaarc.desktop"
         })
         {
             string path = Path.Combine(UserDataRoot, relativePath);

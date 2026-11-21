@@ -9,12 +9,14 @@ using LunaArc.Core.LiveEdit;
 using LunaArc.Core.Pipeline;
 using LunaArc.Core.VfsIndex;
 using LunaArc.Shell;
+using LunaArc.Studio.Services;
 
 namespace LunaArc.Studio.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     private readonly StandardArchiveHandler _backend = new();
+    private readonly GitLabUpdateChecker _updateChecker = new();
     private readonly TempFileWatcher _liveWatcher = new();
     private FlatVfsArena? _currentArena;
     private LunaJobController? _activeJob;
@@ -125,6 +127,34 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         _liveWatcher.OnTempFileModified += HandleLiveFileEdited;
     }
 
+    internal async Task<UpdateCheckResult> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsBusy) throw new InvalidOperationException("Wait for the current operation to finish before checking for updates.");
+        IsBusy = true;
+        StatusMessage = "Checking GitLab for LunaArc updates...";
+        try
+        {
+            Version assemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version ?? new Version(0, 0, 0);
+            Version currentVersion = assemblyVersion.Build < 0
+                ? new Version(assemblyVersion.Major, assemblyVersion.Minor, 0)
+                : new Version(assemblyVersion.Major, assemblyVersion.Minor, assemblyVersion.Build);
+            UpdateCheckResult result = await _updateChecker.CheckAsync(currentVersion, cancellationToken);
+            StatusMessage = result.UpdateAvailable
+                ? $"LunaArc {result.LatestVersion} is available."
+                : $"LunaArc {result.CurrentVersion.ToString(3)} is up to date.";
+            return result;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = "Could not check for updates: " + ex.Message;
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     public async Task<bool> OpenArchiveFileAsync(string archivePath, string? recoveredPassword = null)
     {
         try
@@ -209,6 +239,38 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         SelectedItem = null;
         VisibleItems.Clear();
+        string query = SearchQuery?.Trim() ?? string.Empty;
+        bool recursive = query.StartsWith("all:", StringComparison.OrdinalIgnoreCase) || query.StartsWith("recurse:", StringComparison.OrdinalIgnoreCase);
+        if (recursive && _currentArena != null)
+        {
+            query = query[(query.IndexOf(':') + 1)..].Trim();
+            for (int i = 0; i < _currentArena.Count; i++)
+            {
+                var node = _currentArena.GetNode(i);
+                string name = _currentArena.GetName(i);
+                string fullPath = _currentArena.GetFullPath(i);
+                if (string.IsNullOrWhiteSpace(query) || name.Contains(query, StringComparison.OrdinalIgnoreCase) || fullPath.Contains(query, StringComparison.OrdinalIgnoreCase))
+                {
+                    VisibleItems.Add(new VfsRowItem
+                    {
+                        NodeIndex = i,
+                        Icon = node.IsDirectory ? "📁" : (node.IsEncrypted ? "🔒" : "📄"),
+                        Name = fullPath,
+                        FullRelativePath = fullPath,
+                        IsDirectory = node.IsDirectory,
+                        IsEncrypted = node.IsEncrypted,
+                        OriginalSizeBytes = node.UncompressedSize,
+                        CompressedSizeBytes = node.CompressedSize,
+                        OriginalSizeDisplay = node.IsDirectory ? string.Empty : FormatSize(node.UncompressedSize),
+                        CompressedSizeDisplay = node.IsDirectory ? "-" : node.CompressedSize == 0 && node.UncompressedSize > 0 ? "-" : FormatSize(node.CompressedSize),
+                        RatioDisplay = node.IsDirectory || node.CompressedSize == 0 && node.UncompressedSize > 0 ? "-" : $"{node.CompressionRatio:0.0}%",
+                        CrcDisplay = node.IsDirectory || node.Crc32 == 0 ? "-" : $"{node.Crc32:X8}",
+                        ModifiedDisplay = node.LastWriteUnixTime == 0 ? "-" : DateTimeOffset.FromUnixTimeSeconds(node.LastWriteUnixTime).ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+                    });
+                }
+            }
+        }
+        else
         foreach (var row in _folderRows)
             if (string.IsNullOrWhiteSpace(SearchQuery) || row.Name.Contains(SearchQuery.Trim(), StringComparison.OrdinalIgnoreCase))
                 VisibleItems.Add(row);
@@ -373,7 +435,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
             outputArchivePath = CompressionOptionsViewModel.ValidateOutputPath(outputArchivePath, sourcePaths);
             StatusMessage = "Creating archive and requested companion files...";
             var format = SelectedFormatIndex switch { 1 => OutputArchiveFormat.Zip, 2 when PasswordInput.Length > 0 => OutputArchiveFormat.EncryptedTarGz, 2 => OutputArchiveFormat.TarGz,
-                3 => OutputArchiveFormat.SevenZip, _ => OutputArchiveFormat.LarcNative };
+                3 => OutputArchiveFormat.SevenZip, 4 => OutputArchiveFormat.TarZst, _ => OutputArchiveFormat.LarcNative };
             string result = await Task.Run(() => ArchiveCreationService.CreateAsync(sourcePaths, new CompressOptions
             {
                 OutputArchivePath = outputArchivePath, Format = format,

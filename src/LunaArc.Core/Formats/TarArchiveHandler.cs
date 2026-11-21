@@ -8,17 +8,21 @@ using LunaArc.Core.VfsIndex;
 namespace LunaArc.Core.Formats;
 
 /// <summary>
-/// Streams standard TAR and TAR GZip archives through the .NET TAR reader.
+/// Streams standard TAR, TAR GZip and TAR Zstandard archives through the .NET TAR reader.
 /// </summary>
 internal static class TarArchiveHandler
 {
     public static bool Handles(string path) => path.EndsWith(".tar", StringComparison.OrdinalIgnoreCase)
         || path.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)
-        || path.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase);
+        || path.EndsWith(".tgz", StringComparison.OrdinalIgnoreCase)
+        || path.EndsWith(".tar.zst", StringComparison.OrdinalIgnoreCase)
+        || path.EndsWith(".tzst", StringComparison.OrdinalIgnoreCase);
 
     private static Stream Open(string path)
     {
         var file = File.OpenRead(path);
+        if (path.EndsWith(".tar.zst", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".tzst", StringComparison.OrdinalIgnoreCase))
+            return new ZstdDecompressionStream(file);
         return path.EndsWith(".tar", StringComparison.OrdinalIgnoreCase)
             ? file : new GZipStream(file, CompressionMode.Decompress);
     }
@@ -36,7 +40,7 @@ internal static class TarArchiveHandler
             ValidateEntryType(entry);
             arena.AddEntry(entry.Name, entry.Length, entry.Length, 0, entry.ModificationTime.UtcDateTime,
                 entry.EntryType == TarEntryType.Directory, false);
-            // GZip cannot seek past bodies. Drain in bounded chunks so pause/cancel remain responsive.
+            // Compressed streams cannot seek past bodies. Drain in bounded chunks so pause/cancel remain responsive.
             if (job != null && !stream.CanSeek && entry.DataStream != null)
             {
                 using var discard = new VerificationWriteStream(job, entry.Length);
@@ -138,5 +142,48 @@ internal static class TarArchiveHandler
     {
         if (entry.EntryType is not (TarEntryType.Directory or TarEntryType.RegularFile or TarEntryType.V7RegularFile))
             throw new NotSupportedException($"Unsupported TAR entry type '{entry.EntryType}' in '{entry.Name}'. Links and device entries are not extracted.");
+    }
+
+    private sealed class ZstdDecompressionStream : Stream
+    {
+        private readonly FileStream _file;
+        private readonly ZstdSharp.DecompressionStream _zstd;
+
+        public ZstdDecompressionStream(FileStream file)
+        {
+            _file = file;
+            _zstd = new ZstdSharp.DecompressionStream(file);
+        }
+
+        public override bool CanRead => _zstd.CanRead;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => _zstd.Length;
+        public override long Position { get => _zstd.Position; set => throw new NotSupportedException(); }
+        public override void Flush() => _zstd.Flush();
+        public override int Read(byte[] buffer, int offset, int count) => _zstd.Read(buffer, offset, count);
+        public override int Read(Span<byte> buffer) => _zstd.Read(buffer);
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) => _zstd.ReadAsync(buffer, cancellationToken);
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) => _zstd.ReadAsync(buffer, offset, count, cancellationToken);
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _zstd.Dispose();
+                _file.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            await _zstd.DisposeAsync();
+            await _file.DisposeAsync();
+            await base.DisposeAsync();
+        }
     }
 }

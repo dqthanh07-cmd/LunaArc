@@ -16,6 +16,20 @@ public sealed class StandardArchiveHandler : IArchiveBackend
 {
     private readonly LarcNativeHandler _larcHandler = new();
 
+    public static bool IsSupportedArchive(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        if (path.EndsWith(".larc", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".7z", StringComparison.OrdinalIgnoreCase) ||
+            path.EndsWith(".rar", StringComparison.OrdinalIgnoreCase) ||
+            IsoArchiveHandler.Handles(path) ||
+            path.EndsWith(".001", StringComparison.OrdinalIgnoreCase) ||
+            TarArchiveHandler.Handles(path))
+            return true;
+        return false;
+    }
+
     public async Task<FlatVfsArena> ReadCatalogAsync(string archivePath, string? password = null, CancellationToken ct = default)
     {
         using var job = new LunaJobController(); using var cancellation = ct.Register(job.Cancel);
@@ -44,6 +58,9 @@ public sealed class StandardArchiveHandler : IArchiveBackend
 
         if (TarArchiveHandler.Handles(archivePath))
             return await TarArchiveHandler.ReadCatalogAsync(archivePath, ct, job);
+
+        if (IsoArchiveHandler.Handles(archivePath))
+            return await IsoArchiveHandler.ReadCatalogAsync(archivePath, ct, job);
 
         return await Task.Run(() =>
         {
@@ -127,6 +144,12 @@ public sealed class StandardArchiveHandler : IArchiveBackend
         if (TarArchiveHandler.Handles(archivePath))
         {
             await TarArchiveHandler.ExtractAsync(archivePath, options, controller, onProgress);
+            return;
+        }
+
+        if (IsoArchiveHandler.Handles(archivePath))
+        {
+            await IsoArchiveHandler.ExtractAsync(archivePath, extractionCatalog, options, controller, onProgress);
             return;
         }
 
@@ -223,8 +246,8 @@ public sealed class StandardArchiveHandler : IArchiveBackend
         if (!Enum.IsDefined(options.Level)) throw new ArgumentOutOfRangeException(nameof(options.Level));
         if (sourcePaths.Count == 0 || sourcePaths.Any(p => !File.Exists(p) && !Directory.Exists(p)))
             throw new ArgumentException("Every source must be an existing file or directory.");
-        if (options.Format == OutputArchiveFormat.TarZst)
-            throw new NotSupportedException("TAR Zstandard output is not implemented. Use .tar.gz or .larc.");
+        if (options.Format == OutputArchiveFormat.TarZst && !string.IsNullOrEmpty(options.Password))
+            throw new NotSupportedException("TAR Zstandard does not support native password encryption. Use LARC, ZIP or 7z for password protection.");
         if (options.Format == OutputArchiveFormat.TarGz && !string.IsNullOrEmpty(options.Password))
             throw new NotSupportedException("TAR GZip has no native password encryption. Choose ZIP, 7z or LARC.");
         if (!Enum.IsDefined(options.Format)) throw new ArgumentOutOfRangeException(nameof(options.Format));
@@ -238,8 +261,8 @@ public sealed class StandardArchiveHandler : IArchiveBackend
                 throw new ArgumentException("The output archive must be outside the source files and directories.");
         }
         var callerProgress = onProgress;
-        string stage = options.Format == OutputArchiveFormat.TarGz ? "Creating TAR GZip" : "Compressing files";
-        onProgress = (done, total, file) => { controller.Report(stage, done, total, file, options.Format != OutputArchiveFormat.TarGz); callerProgress?.Invoke(done, total, file); };
+        string stage = options.Format == OutputArchiveFormat.TarGz ? "Creating TAR GZip" : options.Format == OutputArchiveFormat.TarZst ? "Creating TAR Zstandard" : "Compressing files";
+        onProgress = (done, total, file) => { controller.Report(stage, done, total, file, options.Format != OutputArchiveFormat.TarGz && options.Format != OutputArchiveFormat.TarZst); callerProgress?.Invoke(done, total, file); };
         controller.Report(stage);
         if (options.Format == OutputArchiveFormat.LarcNative)
         {
@@ -348,6 +371,17 @@ public sealed class StandardArchiveHandler : IArchiveBackend
         }
     }
 
+    private static int GetZstdCompressionLevel(LunaCompressionLevel level) => level switch
+    {
+        LunaCompressionLevel.Store => 1,
+        LunaCompressionLevel.Fastest => 1,
+        LunaCompressionLevel.Fast => 3,
+        LunaCompressionLevel.Normal => 6,
+        LunaCompressionLevel.Good => 9,
+        LunaCompressionLevel.Best => 19,
+        _ => 6
+    };
+
     private static async Task CreateTarCompressedArchiveAsync(
         IReadOnlyList<string> sourcePaths,
         CompressOptions options,
@@ -357,33 +391,37 @@ public sealed class StandardArchiveHandler : IArchiveBackend
         await Task.Run(() =>
         {
             using var outStream = new FileStream(options.OutputArchivePath, FileMode.CreateNew, FileAccess.Write);
-            CompressionLevel compression = options.Level switch
-            {
-                LunaCompressionLevel.Store => CompressionLevel.NoCompression,
-                LunaCompressionLevel.Fastest or LunaCompressionLevel.Fast => CompressionLevel.Fastest,
-                LunaCompressionLevel.Best => CompressionLevel.SmallestSize,
-                _ => CompressionLevel.Optimal
-            };
-            using var gzip = new GZipStream(outStream, compression);
-            using var writer = new System.Formats.Tar.TarWriter(gzip, System.Formats.Tar.TarEntryFormat.Pax);
-            var entries = new List<(string FullPath, string RelativePath)>();
-            foreach (string source in sourcePaths)
-            {
-                string fullPath = Path.GetFullPath(source);
-                string parent = Path.GetDirectoryName(fullPath) ?? fullPath;
-                entries.Add((fullPath, Path.GetFileName(fullPath)));
-                if (Directory.Exists(fullPath))
+            Stream compressedStream = options.Format == OutputArchiveFormat.TarZst
+                ? new ZstdSharp.CompressionStream(outStream, GetZstdCompressionLevel(options.Level))
+                : new GZipStream(outStream, options.Level switch
                 {
-                    foreach (string item in Directory.EnumerateFileSystemEntries(fullPath, "*", SearchOption.AllDirectories))
-                        entries.Add((item, Path.GetRelativePath(parent, item).Replace('\\', '/')));
-                }
-            }
-            for (int i = 0; i < entries.Count; i++)
+                    LunaCompressionLevel.Store => CompressionLevel.NoCompression,
+                    LunaCompressionLevel.Fastest or LunaCompressionLevel.Fast => CompressionLevel.Fastest,
+                    LunaCompressionLevel.Best => CompressionLevel.SmallestSize,
+                    _ => CompressionLevel.Optimal
+                });
+            using (compressedStream)
             {
-                controller.WaitIfPaused();
-                controller.Token.ThrowIfCancellationRequested();
-                writer.WriteEntry(entries[i].FullPath, entries[i].RelativePath);
-                onProgress?.Invoke(i + 1, entries.Count, entries[i].RelativePath);
+                using var writer = new System.Formats.Tar.TarWriter(compressedStream, System.Formats.Tar.TarEntryFormat.Pax);
+                var entries = new List<(string FullPath, string RelativePath)>();
+                foreach (string source in sourcePaths)
+                {
+                    string fullPath = Path.GetFullPath(source);
+                    string parent = Path.GetDirectoryName(fullPath) ?? fullPath;
+                    entries.Add((fullPath, Path.GetFileName(fullPath)));
+                    if (Directory.Exists(fullPath))
+                    {
+                        foreach (string item in Directory.EnumerateFileSystemEntries(fullPath, "*", SearchOption.AllDirectories))
+                            entries.Add((item, Path.GetRelativePath(parent, item).Replace('\\', '/')));
+                    }
+                }
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    controller.WaitIfPaused();
+                    controller.Token.ThrowIfCancellationRequested();
+                    writer.WriteEntry(entries[i].FullPath, entries[i].RelativePath);
+                    onProgress?.Invoke(i + 1, entries.Count, entries[i].RelativePath);
+                }
             }
         }, controller.Token);
     }
@@ -441,6 +479,9 @@ public sealed class StandardArchiveHandler : IArchiveBackend
 
         if (TarArchiveHandler.Handles(archivePath))
             return await TarArchiveHandler.TestAsync(archivePath, controller, onProgress);
+
+        if (IsoArchiveHandler.Handles(archivePath))
+            return await IsoArchiveHandler.TestAsync(archivePath, controller, onProgress);
 
         return await Task.Run(() =>
         {

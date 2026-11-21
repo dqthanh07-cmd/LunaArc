@@ -8,7 +8,7 @@ Read relevant source, callers, project configuration and related `task/` notes b
 
 Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
-The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`; `github` retains the previous GitHub remote. The GitLab repository is public. Existing GitHub releases and Actions runs remain historical download and verification sources; GitLab CI and releases are not yet configured. Do not replace working release links with unverified GitLab links.
+The primary Git remote is `origin` at `https://gitlab.com/lunadevai-group/lunaarc.git`. GitLab CI in `.gitlab-ci.yml` runs native Windows/Linux verification and exposes a manual promotion job that uses successful same-pipeline artifacts. It verifies Windows checksums, packages Linux, publishes immutable versioned package assets and creates a GitLab Release. Keep release version/tag variables synchronized with `Directory.Build.props`; never replace an existing release or package asset. Studio's Check for updates action reads the latest public GitLab Release metadata and opens its release page; it does not install binaries automatically. The repository must be publicly readable for anonymous update checks.
 
 ## Architecture
 
@@ -23,10 +23,9 @@ The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git
 - `tests/LunaArc.StudioChecks`: headless Skia rendering and interaction checks for the actual Avalonia views, with PNG captures.
 - `installers`: self-contained publish scripts, versioned Windows portable ZIP/setup packaging, Inno Setup definition and CI-only installer lifecycle checks.
 - `branding`: logo and EULA; `native_libs`: optional-library notes, not an implemented native adapter.
-- `.github/workflows/build.yml`: GitHub Actions configuration for native Windows/Linux verification and artifact publishing; it does not run on GitLab.
-- `.github/workflows/release.yml`: explicitly dispatched promotion of a successful main-branch build to versioned GitHub Release assets. Never rebuild or overwrite an existing release; verify Windows checksums before promotion and include SHA-256 for all three release packages.
+- `.gitlab-ci.yml`: native Windows/Linux build and verification pipelines, expiring job artifacts, and manual promotion of the exact successful pipeline outputs to GitLab Releases.
 
-Current dependencies: SharpCompress 0.50.5, SharpZipLib 1.4.2 (encrypted ZIP writing), ZstdSharp.Port 0.8.7, Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Check `.csproj` for the actual versions. Upgrade only when needed by the task and verify affected APIs and archive fixtures.
+Current dependencies: SharpCompress 0.50.5, SharpZipLib 1.4.2 (encrypted ZIP writing), ZstdSharp.Port 0.8.7, LTRData DiscUtils ISO9660/UDF readers 1.0.90, Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Check `.csproj` for the actual versions. Upgrade only when needed by the task and verify affected APIs and archive fixtures.
 
 ## Current behavior and limits
 
@@ -34,7 +33,8 @@ Current dependencies: SharpCompress 0.50.5, SharpZipLib 1.4.2 (encrypted ZIP wri
 - LunaJobController reports typed per-phase progress, byte throughput and ETA using active (non-paused) time. Throttle byte updates; never label item counts as bytes or invent progress for external encoders. UI consumers marshal updates and ignore callbacks after finish/cancel; preserve legacy callback contracts.
 - Explicit .tar.gz.7z wrappers expose/extract final TAR contents automatically after validating exactly one root .tar.gz entry and its checksum/length. Preserve the compound suffix through split materialization and EncryptedTarGz SFX footers. Generic .7z stays non-recursive. Inner selection/overwrite/update and path guards still apply. Catalog staging needs disk space; remove its session intermediate normally.
 
-- `StandardArchiveHandler` is shared by CLI and Studio. Standard TAR/TAR GZip processing uses `TarArchiveHandler` and .NET TAR APIs; other standard formats use SharpCompress.
+- `StandardArchiveHandler` is shared by CLI and Studio. Standard TAR/TAR GZip processing uses `TarArchiveHandler` and .NET TAR APIs; ZIP/RAR/7z use SharpCompress, and `.iso` uses the DiscUtils ISO 9660/Joliet and UDF readers.
+- `.iso` images are read-only and use the DiscUtils ISO 9660/Joliet and UDF readers. They can be browsed, extracted and tested through the shared archive backend.
 - Plain `.larc` retains v1 (magic LUNAARC plus byte 01). New password-protected creation wraps an unencrypted v1 archive in authenticated v2 (magic LUNAARC plus byte 02). Read both versions; never rewrite old archives automatically. Older apps cannot open v2. See branding/LARC_FORMAT.md. V2 needs a full authentication pass and temporary plaintext archive space before catalog/extraction.
 - .larc payload creation/extraction streams through pooled 64 KiB buffers, incremental CRC32, Zstandard and CBC streams. Metadata is still buffered and scales with entry count; high Zstandard presets use additional codec memory. Keep pledged frame sizes for old v1 readers, exact output-length checks and cancellation during chunks.
 - ZIP password creation uses WinZip AES-256 through SharpZipLib and independent SharpCompress/authentication verification; filenames remain visible. Encrypted ZIP64 is supported with independent AES authentication and checked 64-bit directory/entry bounds; split creation remains unsupported. 7z password creation uses AES-256 with encrypted headers through the pinned encoder; pass secrets via redirected UTF-8 stdin, never arguments or files. Passwords cannot include CR/LF/NUL and are limited to 1024 characters for 7z. TAR GZip has no native encryption: the appended EncryptedTarGz format creates an encrypted 7z containing one normal TAR GZip (.tar.gz.7z), automatically expanded in one operation by LunaArc 2.3+; source deletion is unavailable for that nested wrapper. Preserve existing enum values and LARC v1 reading. Authenticated v2 is used for new password-protected LARC. `TarZst` remains unsupported. Solid compression is 7z-only; `EncryptHeader` is not an independent option.

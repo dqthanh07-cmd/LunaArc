@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:LunaArc.Studio.ViewModels" x:Class="LunaArc.Studio.Views.MainWindow" x:DataType="vm:MainWindowViewModel"
  Title="{Binding WindowTitle}" Width="1280" Height="820" MinWidth="720" MinHeight="500"
- Background="#0B1422" Foreground="#EAF2FF" FontFamily="avares://Avalonia.Fonts.Inter/Assets#Inter" FontSize="14" RequestedThemeVariant="Dark" WindowStartupLocation="CenterScreen">
+ Background="#0B1422" Foreground="#EAF2FF" FontFamily="avares://Avalonia.Fonts.Inter/Assets#Inter" FontSize="14" RequestedThemeVariant="Dark" WindowStartupLocation="CenterScreen" DragDrop.AllowDrop="True">
  <Window.Resources>
   <SolidColorBrush x:Key="DataGridRowSelectedBackgroundBrush" Color="#244154"/>
   <SolidColorBrush x:Key="DataGridRowSelectedHoveredBackgroundBrush" Color="#2B5064"/>
@@ -64,7 +64,8 @@
                 </MenuItem>
                 <MenuItem Name="HelpMenu" Header="_Help">
                     <MenuItem Name="HelpTopicsMenu" Header="Help _topics" InputGesture="F1" Click="OnHelpTopicsClicked"/>
-                    <MenuItem Name="HomePageMenu" Header="_Home page (GitLab)" Click="OnHomePageClicked" ToolTip.Tip="https://gitlab.com/itmylifeex/lunaarc" />
+                    <MenuItem Name="CheckForUpdatesMenu" Header="Check for _updates..." Click="OnCheckForUpdatesClicked" />
+                    <MenuItem Name="HomePageMenu" Header="_Home page (GitLab)" Click="OnHomePageClicked" ToolTip.Tip="https://gitlab.com/lunadevai-group/lunaarc" />
                     <Separator />
                     <MenuItem Name="AboutMenu" Header="_About LunaArc" Click="OnAboutClicked" />
                 </MenuItem>

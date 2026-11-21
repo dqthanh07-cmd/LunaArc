@@ -39,6 +39,7 @@ public partial class CompressionOptionsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsZip))]
     [NotifyPropertyChangedFor(nameof(IsTarGzip))]
     [NotifyPropertyChangedFor(nameof(IsSevenZip))]
+    [NotifyPropertyChangedFor(nameof(IsTarZst))]
     [NotifyPropertyChangedFor(nameof(CanUseSolid))]
     [NotifyPropertyChangedFor(nameof(FormatNote))]
     [NotifyPropertyChangedFor(nameof(CanComment))]
@@ -48,13 +49,15 @@ public partial class CompressionOptionsViewModel : ObservableObject
     public bool IsLarc { get => SelectedFormatIndex == 0; set { if (value) SelectedFormatIndex = 0; } }
     public bool IsZip { get => SelectedFormatIndex == 1; set { if (value) SelectedFormatIndex = 1; } }
     public bool IsTarGzip { get => SelectedFormatIndex == 2; set { if (value) SelectedFormatIndex = 2; } }
+    public bool IsTarZst { get => SelectedFormatIndex == 4; set { if (value) SelectedFormatIndex = 4; } }
     public bool CanComment => SelectedFormatIndex is 0 or 1;
     public bool CanDeleteSources => IsCreation && !HasSplit && !(IsTarGzip && PasswordInput.Length > 0);
     public string Extension => CreateSfx ? (OperatingSystem.IsWindows() ? ".exe" : ".run") : PayloadExtension;
-    private string PayloadExtension => SelectedFormatIndex switch { 1 => ".zip", 2 when PasswordInput.Length > 0 => ".tar.gz.7z", 2 => ".tar.gz", 3 => ".7z", _ => ".larc" };
+    private string PayloadExtension => SelectedFormatIndex switch { 1 => ".zip", 2 when PasswordInput.Length > 0 => ".tar.gz.7z", 2 => ".tar.gz", 3 => ".7z", 4 => ".tar.zst", _ => ".larc" };
     public string FormatNote => IsLarc ? "LARC passwords use authenticated AES-256-GCM v2, including file names. Older LunaArc versions cannot open v2; v1 remains readable."
         : IsZip ? "ZIP supports WinZip AES-256 passwords and comments. File names remain visible. ZIP64 supports large files and many entries. Volume splitting uses LunaArc numbered parts plus a manifest."
         : IsSevenZip ? "7z supports AES-256 passwords with encrypted file names and solid LZMA2 compression. Encoding needs the packaged 7-Zip tool and staging space. Pause applies before/after encoding; Cancel stops it."
+        : IsTarZst ? "TAR Zstandard (.tar.zst) provides fast streaming compression using Zstandard. Passwords are not supported for this format."
         : "With a password, creates .tar.gz.7z: an AES-256 encrypted 7z containing one TAR GZip. LunaArc extracts both layers automatically. Source deletion is unavailable for this wrapper.";
     public string PasswordSummary => PasswordInput.Length == 0 ? "No password set" : "Password set";
 
@@ -101,10 +104,26 @@ public partial class CompressionOptionsViewModel : ObservableObject
     {
         if (ArchiveName.Length == 0) return;
         string name = ArchiveName;
-        foreach (string extension in new[] { ".tar.gz.7z", ".tar.gz", ".larc", ".zip", ".7z", ".exe", ".run" })
+        foreach (string extension in new[] { ".tar.gz.7z", ".tar.gz", ".tar.zst", ".larc", ".zip", ".7z", ".exe", ".run" })
             if (name.EndsWith(extension, StringComparison.OrdinalIgnoreCase)) { name = name[..^extension.Length]; break; }
         ArchiveName = name + Extension;
         Status = string.Empty;
+    }
+
+    public void ApplyPresetFast()
+    {
+        SelectedLevelIndex = 1;
+        SolidArchive = false;
+        AddRecoveryRecord = false;
+        TestCreatedArchive = false;
+    }
+
+    public void ApplyPresetMaximum()
+    {
+        SelectedLevelIndex = 5;
+        if (IsSevenZip) SolidArchive = true;
+        AddRecoveryRecord = true;
+        TestCreatedArchive = true;
     }
 
     public bool Validate()
@@ -115,10 +134,12 @@ public partial class CompressionOptionsViewModel : ObservableObject
                 throw new ArgumentException("Split size must be a whole number from 1 to 1,048,576 MiB. Leave blank for one archive.");
             if (HasSplit && (CreateSfx || AddRecoveryRecord || LockArchive || DeleteSourceAfterArchiving))
                 throw new ArgumentException("Split sets cannot combine with SFX, recovery, lock or source deletion.");
-            if (SelectedFormatIndex is < 0 or > 3 || SelectedLevelIndex is < 0 or > 5)
+            if (SelectedFormatIndex is < 0 or > 4 || SelectedLevelIndex is < 0 or > 5)
                 throw new ArgumentException("Choose a supported format and compression method.");
             if ((IsSevenZip || IsTarGzip) && PasswordInput.Length > 0 && (PasswordInput.Length > 1024 || PasswordInput.IndexOfAny(new[] { '\r', '\n', '\0' }) >= 0))
                 throw new ArgumentException("7z passwords must be at most 1024 characters and cannot contain line breaks or NUL.");
+            if (IsTarZst && PasswordInput.Length > 0)
+                throw new ArgumentException("TAR Zstandard does not support passwords. Clear the password or choose LARC, ZIP or 7z.");
             if (!CanDeleteSources && DeleteSourceAfterArchiving) throw new ArgumentException("Source deletion is unavailable for the nested TAR GZip wrapper.");
             if (!CanComment && ArchiveComment.Length > 0) throw new ArgumentException("This format does not support archive comments. Clear the comment or choose LARC / ZIP.");
             if (SolidArchive && !IsSevenZip) throw new ArgumentException("Select 7z for solid compression.");

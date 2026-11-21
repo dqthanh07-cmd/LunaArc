@@ -4,20 +4,20 @@
 
 LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend.
 
-The primary source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaarc). It is public; the existing 2.3.0 downloads and verified builds remain hosted on GitHub. GitLab CI and releases have not yet been configured.
+The source repository is [LunaArc on GitLab](https://gitlab.com/lunadevai-group/lunaarc). GitLab CI verifies native Windows and Linux builds. Versioned downloads are published as GitLab Releases after a successful default-branch pipeline is manually promoted.
 
 ## Download
 
-Version **2.3.0** adds estimated free-space checks, progress by phase with measured throughput/ETA, and automatic final-file extraction for `.tar.gz.7z`. Includes authenticated LARC v2, LunaArc split sets, Nocturne Orbit and optional Windows 11 main-menu setup with explicit certificate consent. Native Windows/Linux builds passed 431/433 archive checks and 180 rendered UI checks per OS, published password/SFX/split-set checks and Windows Setup/Portable lifecycle checks. Download the [published release](https://github.com/lunavibe07/LunaArc/releases/tag/v2.3.0), built from the [verified source run](https://github.com/lunavibe07/LunaArc/actions/runs/38822333666).
+Version **2.3.0** adds estimated free-space checks, progress by phase with measured throughput/ETA, and automatic final-file extraction for `.tar.gz.7z`. Includes authenticated LARC v2, LunaArc split sets, Nocturne Orbit and optional Windows 11 main-menu setup with explicit certificate consent. Previously verified Windows/Linux builds and package checks are historical; GitLab downloads become available after the first verified GitLab release.
 
-| Edition | Download | Getting started |
+| Edition | GitLab Release download (after first release) | Getting started |
 | --- | --- | --- |
-| Windows x64 Setup | [Download installer](https://github.com/lunavibe07/LunaArc/releases/download/v2.3.0/LunaArc-2.3.0-setup-win-x64.exe) | Run `LunaArc-2.3.0-setup-win-x64.exe` directly. |
-| Windows x64 Portable | [Download portable](https://github.com/lunavibe07/LunaArc/releases/download/v2.3.0/LunaArc-2.3.0-portable-win-x64.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
-| Linux x64 | [Download Linux](https://github.com/lunavibe07/LunaArc/releases/download/v2.3.0/LunaArc-2.3.0-linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. Executable permissions are included. |
-| SHA-256 checksums | [Download checksums](https://github.com/lunavibe07/LunaArc/releases/download/v2.3.0/SHA256SUMS.txt) | Verify the Setup EXE, portable ZIP or Linux TAR.GZ. |
+| Windows x64 Setup | [Download installer](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Setup.exe) | Run the downloaded installer directly. |
+| Windows x64 Portable | [Download portable](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Portable.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
+| Linux x64 | [Download Linux](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
+| SHA-256 checksums | [Download checksums](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/SHA256SUMS.txt) | Verify all three packages. |
 
-Public Release downloads do not require signing in and are not subject to Actions artifact expiry. Visit [Latest release](https://github.com/lunavibe07/LunaArc/releases/latest) for future versions. Preview builds remain under [Build and verify](https://github.com/lunavibe07/LunaArc/actions/workflows/build.yml); their Actions artifacts require sign-in and expire. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
+These stable links resolve after a GitLab Release is published. Preview builds are available from the [GitLab pipelines](https://gitlab.com/lunadevai-group/lunaarc/-/pipelines); pipeline artifacts may require sign-in and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
 
 ## Projects
 
@@ -29,7 +29,7 @@ Public Release downloads do not require signing in and are not subject to Action
 | `src/LunaArc.Studio` | `LunaArc` desktop application using Avalonia and MVVM |
 | `tests/LunaArc.SmokeTests` | Executable integration checks using synthetic archive fixtures |
 
-Core uses SharpCompress 0.50.5, SharpZipLib 1.4.2 ([MIT license](branding/SharpZipLib_LICENSE.txt)) for encrypted ZIP writing, and ZstdSharp.Port 0.8.7. Published packages include the separate 7-Zip 26.04 encoder; see [license](branding/SevenZip_LICENSE.txt), [LGPL](branding/SevenZip_COPYING.txt) and [source/notice](branding/SevenZip_NOTICE.txt). Studio uses Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Standard TAR and TAR GZip handling uses the .NET TAR APIs.
+Core uses SharpCompress 0.50.5, SharpZipLib 1.4.2 ([MIT license](branding/SharpZipLib_LICENSE.txt)) for encrypted ZIP writing, ZstdSharp.Port 0.8.7, and LTRData DiscUtils 1.0.90 for ISO 9660/Joliet and UDF image reading. Published packages include the separate 7-Zip 26.04 encoder; see [license](branding/SevenZip_LICENSE.txt), [LGPL](branding/SevenZip_COPYING.txt) and [source/notice](branding/SevenZip_NOTICE.txt). Studio uses Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Standard TAR and TAR GZip handling uses the .NET TAR APIs.
 
 ## Desktop interface
 
@@ -60,7 +60,7 @@ Version **1.4.5** replaces the logo with the supplied moon-and-sun infinity artw
 - **Find** / **F3** filters names in the current folder without changing archive contents. Size columns sort by numeric byte counts.
 - **Archive info** shows the current archive path, folder/file summary and available comment. **Options** opens compression/password settings; cancelling restores the previous settings.
 - **File** includes close archive and exit; **Tools** contains context-menu installation. **Ctrl+O** opens an archive.
-- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitLab)** opens [the LunaArc repository](https://gitlab.com/itmylifeex/lunaarc) in your default browser. **Help > About LunaArc** displays the application version and logo.
+- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitLab)** opens [the LunaArc repository](https://gitlab.com/lunadevai-group/lunaarc) in your default browser. **Help > Check for updates** checks the latest GitLab Release and opens its page when a newer version is available. **Help > About LunaArc** displays the application version and logo.
 
 The **Help Topics** window has a classic two-pane layout. Choose a topic in Contents/Index, enter a word in Search, or follow a related-topic link below an article. **Add favorite / Remove favorite** saves only topic IDs in the current user's `LunaArc/help-favorites.json` under the OS local application-data directory. **Hide navigation** expands the article; **Show navigation** restores the tabs. The guide is embedded in the application and needs no internet or Windows CHM viewer, so the same help works on Windows and Linux. It documents current capabilities and limits, including ZIP file-name visibility and automatic two-layer extraction for encrypted TAR GZip.
 
@@ -227,7 +227,7 @@ Both scripts publish self-contained executables, include native libraries in the
 
 To use a specific SDK executable, pass `-DotNet /path/to/dotnet` to the PowerShell script or set `DOTNET_COMMAND=/path/to/dotnet` for Bash. Scripts also use `.tools/dotnet` when no SDK is available in PATH. This checkout has a local Windows SDK at `.tools/dotnet/dotnet.exe`; it is ignored by version control. For local build commands in this environment, use `& ./.tools/dotnet/dotnet.exe` in place of `dotnet`.
 
-Cross-publishing Linux binaries on Windows verifies packaging, not Linux execution. The GitHub Actions workflow runs native Windows and Ubuntu build, smoke-test and publish jobs. Check the run for your downloaded artifact in the repository's Actions tab.
+Cross-publishing Linux binaries on Windows verifies packaging, not Linux execution. The GitLab pipeline runs native Windows and Linux build, smoke-check and publish jobs. Check the pipeline and its job artifacts on the project's Pipelines page.
 
 ## Windows right-click menus
 
@@ -249,15 +249,15 @@ Keep the folder in place while its menu is registered. **UninstallContextMenu.cm
 
 Both editions contain identical `LunaArc.exe` and `luna-cli.exe` binaries, so archive formats and extraction/compression options are the same.
 
-| Download in GitHub Actions | File inside the artifact | How to use |
+| Download in GitLab CI | File inside the artifact | How to use |
 | --- | --- | --- |
 | `LunaArc-Windows-Setup` | `LunaArc-<version>-setup-win-x64.exe` | Run the wizard; choose Explorer integration and an optional desktop shortcut |
 | `LunaArc-Windows-Portable` | `LunaArc-<version>-portable-win-x64.zip` | Extract the inner ZIP, run `LunaArc.exe`, optionally run `InstallContextMenu.cmd` |
 | `LunaArc-Windows-Checksums` | `SHA256SUMS.txt` | SHA-256 checksums for both packages |
 
-GitHub Releases provides the Setup EXE and portable ZIP directly. Preview downloads from GitHub Actions still wrap each artifact in an additional ZIP. Setup installs per-user under `%LOCALAPPDATA%\Programs\LunaArc`, with Start menu and uninstall entries. The classic Explorer task is selected by default; the modern Windows 11 preview task is unchecked and explicitly describes certificate trust. Interactive Setup also offers modern-menu activation after classic integration. Both editions ship the same GUI, CLI, native menu DLL, menu icon, sparse package, public certificate and registration scripts.
+CI job artifacts contain the package files; GitLab Releases provide direct downloads after promotion. Setup installs per-user under `%LOCALAPPDATA%\Programs\LunaArc`, with Start menu and uninstall entries. The classic Explorer task is selected by default; the modern Windows 11 preview task is unchecked and explicitly describes certificate trust. Interactive Setup also offers modern-menu activation after classic integration. Both editions ship the same GUI, CLI, native menu DLL, menu icon, sparse package, public certificate and registration scripts.
 
-To publish a future version, first obtain a successful main-branch **Build and verify** run, then manually run **Publish verified release** with that run ID. The workflow rejects failed, fork, pull-request and non-main builds. It promotes the exact built binaries, verifies the Windows package checksums, packages Linux with executable modes and creates `SHA256SUMS.txt` for all three assets. A draft stages the complete assets before publication; an existing version is never overwritten by this workflow. Release tags point to the verified build commit.
+To publish a version, obtain a successful default-branch pipeline and start its manual **release:verified** job. It promotes that pipeline's exact artifacts, verifies Windows checksums, packages Linux with executable modes and creates `SHA256SUMS.txt` for all three packages. The tag and package files are never replaced when they already exist. Keep `LUNAARC_RELEASE_TAG` and `LUNAARC_RELEASE_VERSION` in `.gitlab-ci.yml` synchronized with `Directory.Build.props` before promotion.
 
 Uninstall removes menus only if they currently point to that installation. If a portable copy has since registered its own menu, uninstalling the installed edition preserves the portable menu. The most recently registered copy owns the common LunaArc commands; the two copies do not create duplicate menus. User-created archives and personal application-data files are not removed by the installer.
 
@@ -294,7 +294,7 @@ Shell registration is explicit and changes the current user's OS configuration. 
 ## Formats and current limitations
 
 - Create: `.larc`, `.zip`, `.tar.gz`, `.7z`. Studio and CLI expose all four; passwords on TAR GZip produce the explicit .tar.gz.7z wrapper. Published GUI/CLI packages support SFX overlays and LunaArc recovery/lock companions.
-- Read/extract: native .larc; `.tar`, `.tar.gz` and `.tgz` through .NET; ZIP, RAR and 7z through SharpCompress. Other compressed inputs depend on SharpCompress's format detection and need representative fixtures before claiming support.
+- Read/extract: native .larc; `.tar`, `.tar.gz` and `.tgz` through .NET; ZIP, RAR and 7z through SharpCompress; `.iso` images using ISO 9660/Joliet and UDF readers. ISO images are read-only and can be browsed, extracted and tested.
 - `.larc` without a password retains v1 metadata/payloads and CRC32. New password-protected LARC uses a v2 AES-GCM envelope over the entire inner archive. Legacy encrypted v1 CBC remains readable. See branding/LARC_FORMAT.md for exact compatibility and temporary-space requirements.
 - ZIP supports WinZip AES-256 passwords (visible file names; ZIP64 supported). 7z supports AES-256 with encrypted names. TAR GZip passwords use an encrypted `.tar.gz.7z` wrapper, automatically expanded in one operation by LunaArc 2.3+; native `.tar.gz` encryption is not claimed. `TarZst` remains in the API enum but creation is explicitly rejected.
 - LunaArc split sets use numbered raw parts and a required SHA-256 manifest. Open .001 to assemble and verify. Native split ZIP/RAR disks and legacy .part001 sets without a manifest remain unsupported.
@@ -315,7 +315,7 @@ The current Windows checkout was checked with .NET SDK 8.0.426:
 - Version 2.3.0 native Windows/Linux self-contained packages passed published encrypted LARC v2, ZIP/7z, TAR wrapper, split-set CLI, standalone SFX and GUI extraction lifecycle checks. Windows Setup/Portable equality, classic/modern registration, COM activation and scoped cleanup passed.
 - Native Ubuntu 24.04 passed 433 archive/filesystem and 180 rendered UI checks. Native OS file-picker dialogs and full interactive GUI SFX desktop behavior remain outside the automated checks.
 
-CI results belong to the specific commit/run; review the Actions tab before downloading an artifact.
+CI results belong to the specific commit/run; review the GitLab Pipelines page before downloading an artifact.
 
 Build artifacts (`bin`, `obj`, `dist`, `.tools`) and local task notes (`task`) are excluded from version control. Project guidance is in [AGENT.md](AGENT.md).
 

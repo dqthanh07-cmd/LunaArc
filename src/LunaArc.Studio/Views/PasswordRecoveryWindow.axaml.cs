@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using LunaArc.Core.Security;
 using LunaArc.Studio.ViewModels;
 
 namespace LunaArc.Studio.Views;
@@ -32,6 +33,30 @@ public partial class PasswordRecoveryWindow : Window
         {
             Vm.ArchivePath = path;
             Vm.CanOpen = false; Vm.RecoveredPassword = string.Empty;
+        }
+    }
+
+    private async void OnLoadWordlist(object? sender, RoutedEventArgs e)
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Choose wordlist dictionary text file (.txt)",
+            AllowMultiple = false,
+            FileTypeFilter = new[] { new FilePickerFileType("Text files") { Patterns = new[] { "*.txt", "*.dict", "*.lst" } } }
+        });
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path)
+        {
+            try
+            {
+                var list = await PasswordRecovery.LoadWordlistAsync(path);
+                Vm.CandidateText = string.Join('\n', list);
+                Vm.ModeIndex = 0;
+                Vm.Status = $"Loaded {list.Count:N0} candidate passwords from {System.IO.Path.GetFileName(path)}.";
+            }
+            catch (Exception ex)
+            {
+                Vm.Status = ex.Message;
+            }
         }
     }
 

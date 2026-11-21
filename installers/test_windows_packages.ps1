@@ -1,9 +1,9 @@
-# Runs only on the disposable Windows GitHub Actions runner: installs and removes test packages.
+# Runs only on a disposable Windows GitLab CI runner: installs and removes test packages.
 [CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
-if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows') {
-    throw 'Installer lifecycle tests run only on a disposable Windows GitHub Actions runner.'
+if ($env:GITLAB_CI -ne 'true' -or $env:OS -ne 'Windows_NT') {
+    throw 'Installer lifecycle tests run only on a disposable Windows GitLab CI runner.'
 }
 $projectRoot = Split-Path -Parent $PSScriptRoot
 [xml]$properties = Get-Content -LiteralPath (Join-Path $projectRoot 'Directory.Build.props') -Raw -Encoding UTF8
@@ -11,7 +11,7 @@ $version = [string]$properties.Project.PropertyGroup.Version
 $packageDir = Join-Path $projectRoot 'dist/packages'
 $setup = Join-Path $packageDir "LunaArc-$version-setup-win-x64.exe"
 $portable = Join-Path $packageDir "LunaArc-$version-portable-win-x64.zip"
-$testBase = [System.IO.Path]::GetFullPath($env:RUNNER_TEMP)
+$testBase = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
 $testRoot = Join-Path $testBase ('LunaArc-Packages-' + [guid]::NewGuid().ToString('N'))
 $installDir = Join-Path $testRoot 'installed app'
 $portableDir = Join-Path $testRoot 'portable app'
