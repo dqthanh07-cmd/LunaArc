@@ -8,16 +8,16 @@ The source repository is [LunaArc on GitHub](https://github.com/dqthanh07-cmd/Lu
 
 ## Download
 
-The initial release, **1.0.0**, is currently the only published version. It includes ISO image browsing and extraction, estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. GitHub Actions built and verified this release before its packages were published.
+The release series started at **1.0.0**. The current release, **1.0.1**, adds ISO extraction to the Windows Explorer menu and includes the LunaCompany MIT license. It carries forward ISO image browsing and extraction, estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. GitHub Actions builds and verifies each release before publishing its packages.
 
 | Edition | Download | Getting started |
 | --- | --- | --- |
-| Windows x64 Setup | [Download installer](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.0/LunaArc-1.0.0-setup-win-x64.exe) | Run the downloaded installer directly. |
-| Windows x64 Portable | [Download portable ZIP](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.0/LunaArc-1.0.0-portable-win-x64.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
-| Linux x64 | [Download Linux TAR.GZ](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.0/LunaArc-1.0.0-linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
-| SHA-256 checksums | [Download checksums](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.0/SHA256SUMS.txt) | Verify all three packages. |
+| Windows x64 Setup | [Download installer](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.1/LunaArc-1.0.1-setup-win-x64.exe) | Run the downloaded installer directly. |
+| Windows x64 Portable | [Download portable ZIP](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.1/LunaArc-1.0.1-portable-win-x64.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
+| Linux x64 | [Download Linux TAR.GZ](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.1/LunaArc-1.0.1-linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
+| SHA-256 checksums | [Download checksums](https://github.com/dqthanh07-cmd/LunaArc/releases/download/v1.0.1/SHA256SUMS.txt) | Verify all three packages. |
 
-Download links point to the immutable [LunaArc 1.0.0 GitHub Release](https://github.com/dqthanh07-cmd/LunaArc/releases/tag/v1.0.0). Preview build artifacts are also available from the [GitHub Actions workflow](https://github.com/dqthanh07-cmd/LunaArc/actions/workflows/build.yml) and expire. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
+Download links point to the immutable [LunaArc 1.0.1 GitHub Release](https://github.com/dqthanh07-cmd/LunaArc/releases/tag/v1.0.1). Preview build artifacts are also available from the [GitHub Actions workflow](https://github.com/dqthanh07-cmd/LunaArc/actions/workflows/build.yml) and expire. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
 
 ## Projects
 
