@@ -8,7 +8,7 @@ Read relevant source, callers, project configuration and related `task/` notes b
 
 Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
-The primary Git remote is `origin` at `https://gitlab.com/lunadevai-group/lunaarc.git`. GitLab CI in `.gitlab-ci.yml` runs native Windows/Linux verification and exposes a manual promotion job that uses successful same-pipeline artifacts. It verifies Windows checksums, packages Linux, publishes immutable versioned package assets and creates a GitLab Release. Keep release version/tag variables synchronized with `Directory.Build.props`; never replace an existing release or package asset. Studio's Check for updates action reads the latest public GitLab Release metadata and opens its release page; it does not install binaries automatically. The repository must be publicly readable for anonymous update checks.
+The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`. GitLab CI in `.gitlab-ci.yml` runs native Windows/Linux verification and exposes a manual promotion job that uses successful same-pipeline artifacts. It verifies Windows checksums, packages Linux, publishes immutable versioned package assets and creates a GitLab Release. Keep release version/tag variables synchronized with `Directory.Build.props`; never replace an existing release or package asset. Studio's Check for updates action reads the latest public GitLab Release metadata and opens its release page; it does not install binaries automatically. The repository must be publicly readable for anonymous update checks.
 
 ## Architecture
 

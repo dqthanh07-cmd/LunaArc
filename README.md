@@ -4,7 +4,7 @@
 
 LunaArc is a Windows and Linux archive application built with .NET 8. It includes an Avalonia desktop interface and a command-line tool that share the same archive backend.
 
-The source repository is [LunaArc on GitLab](https://gitlab.com/lunadevai-group/lunaarc). GitLab CI verifies native Windows and Linux builds. Versioned downloads are published as GitLab Releases after a successful default-branch pipeline is manually promoted.
+The source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaarc). GitLab CI verifies native Windows and Linux builds. Versioned downloads are published as GitLab Releases after a successful default-branch pipeline is manually promoted.
 
 ## Download
 
@@ -12,12 +12,14 @@ Version **2.3.0** adds estimated free-space checks, progress by phase with measu
 
 | Edition | GitLab Release download (after first release) | Getting started |
 | --- | --- | --- |
-| Windows x64 Setup | [Download installer](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Setup.exe) | Run the downloaded installer directly. |
-| Windows x64 Portable | [Download portable](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Portable.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
-| Linux x64 | [Download Linux](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
-| SHA-256 checksums | [Download checksums](https://gitlab.com/lunadevai-group/lunaarc/-/releases/permalink/latest/downloads/SHA256SUMS.txt) | Verify all three packages. |
+| Windows x64 Setup | [Download installer](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Setup.exe) | Run the downloaded installer directly. |
+| Windows x64 Portable | [Download portable](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Portable.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
+| Linux x64 | [Download Linux](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
+| SHA-256 checksums | [Download checksums](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/SHA256SUMS.txt) | Verify all three packages. |
 
-These stable links resolve after a GitLab Release is published. Preview builds are available from the [GitLab pipelines](https://gitlab.com/lunadevai-group/lunaarc/-/pipelines); pipeline artifacts may require sign-in and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
+These stable links resolve after a GitLab Release is published. When CI is enabled, preview artifacts will be available from the [GitLab pipelines](https://gitlab.com/itmylifeex/lunaarc/-/pipelines) and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
+
+A Windows x64 managed-only portable preview is available now: [download LunaArc portable ZIP](https://gitlab.com/api/v4/projects/88556558/packages/generic/LunaArc-Windows-Portable/2.3.0-public-preview-20261121/LunaArc-Windows-Portable.zip). This package was built locally because GitLab CI is currently blocked by account identity verification. It includes the GUI and CLI but not the native Windows 11 Explorer menu extension. SHA-256: `1E1322D35A5E8E989BB09E9B0A727BF7D358C22BD9CA5314A968206058F08075`.
 
 ## Projects
 
@@ -60,7 +62,7 @@ Version **1.4.5** replaces the logo with the supplied moon-and-sun infinity artw
 - **Find** / **F3** filters names in the current folder without changing archive contents. Size columns sort by numeric byte counts.
 - **Archive info** shows the current archive path, folder/file summary and available comment. **Options** opens compression/password settings; cancelling restores the previous settings.
 - **File** includes close archive and exit; **Tools** contains context-menu installation. **Ctrl+O** opens an archive.
-- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitLab)** opens [the LunaArc repository](https://gitlab.com/lunadevai-group/lunaarc) in your default browser. **Help > Check for updates** checks the latest GitLab Release and opens its page when a newer version is available. **Help > About LunaArc** displays the application version and logo.
+- **Help > Help topics / F1** opens the offline user guide with Contents, an alphabetical Index, full-text Search, saved Favorites, related-topic links and Back/Forward navigation. **Help > Home page (GitLab)** opens [the LunaArc repository](https://gitlab.com/itmylifeex/lunaarc) in your default browser. **Help > Check for updates** checks the latest GitLab Release and opens its page when a newer version is available. **Help > About LunaArc** displays the application version and logo.
 
 The **Help Topics** window has a classic two-pane layout. Choose a topic in Contents/Index, enter a word in Search, or follow a related-topic link below an article. **Add favorite / Remove favorite** saves only topic IDs in the current user's `LunaArc/help-favorites.json` under the OS local application-data directory. **Hide navigation** expands the article; **Show navigation** restores the tabs. The guide is embedded in the application and needs no internet or Windows CHM viewer, so the same help works on Windows and Linux. It documents current capabilities and limits, including ZIP file-name visibility and automatic two-layer extraction for encrypted TAR GZip.
 

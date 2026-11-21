@@ -16,9 +16,9 @@ internal sealed class GitLabUpdateChecker
     private const int MaxResponseBytes = 1024 * 1024;
     private const int MaxRedirects = 3;
     private const string GitLabHost = "gitlab.com";
-    private const string ProjectPath = "lunadevai-group/lunaarc";
+    private const string ProjectPath = "itmylifeex/lunaarc";
     private static readonly Uri LatestReleaseApi = new(
-        "https://gitlab.com/api/v4/projects/lunadevai-group%2Flunaarc/releases/permalink/latest");
+        "https://gitlab.com/api/v4/projects/itmylifeex%2Flunaarc/releases/permalink/latest");
     private static readonly HttpClient Client = new(new SocketsHttpHandler { AllowAutoRedirect = false })
     {
         Timeout = TimeSpan.FromSeconds(20)

@@ -304,8 +304,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (!await Launcher.LaunchUriAsync(new Uri("https://gitlab.com/lunadevai-group/lunaarc")) && Vm != null)
-                Vm.StatusMessage = "Could not open the project home page. Visit https://gitlab.com/lunadevai-group/lunaarc";
+            if (!await Launcher.LaunchUriAsync(new Uri("https://gitlab.com/itmylifeex/lunaarc")) && Vm != null)
+                Vm.StatusMessage = "Could not open the project home page. Visit https://gitlab.com/itmylifeex/lunaarc";
         }
         catch (Exception ex)
         {
