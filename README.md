@@ -289,7 +289,7 @@ luna-cli unregister-shell
 
 Quote paths containing spaces. Packing creates `<source>.larc`, `<source>.zip`, `<source>.7z`, `<source>.tar.gz` or `<source>.tar.gz.7z`, or uses the explicit new path from `-o`. Extraction currently overwrites matching destination files by default; choose a separate destination when preserving existing files matters. `test` returns a nonzero exit code for an unhealthy archive. Unknown commands and incomplete arguments also fail.
 
-Shell registration is explicit and changes the current user's OS configuration. Run it from the published directory. Windows registers per-extension Explorer verbs through `SystemFileAssociations` and adds LunaArc as an Open With choice without changing existing defaults. It notifies Explorer after installation/removal. Linux registration creates a desktop launcher and Nautilus scripts under `XDG_DATA_HOME` (or `~/.local/share`); it does not automatically set default MIME associations or install Dolphin menus.
+Shell registration is explicit and changes the current user's OS configuration. Run it from the published directory. Windows registers per-extension Explorer verbs, including ISO image extraction, through `SystemFileAssociations` and adds LunaArc as an Open With choice without changing existing defaults. It notifies Explorer after installation/removal. Linux registration creates a desktop launcher and Nautilus scripts under `XDG_DATA_HOME` (or `~/.local/share`); it does not automatically set default MIME associations or install Dolphin menus.
 
 ## Formats and current limitations
 

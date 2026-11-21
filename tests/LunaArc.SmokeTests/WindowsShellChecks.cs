@@ -28,7 +28,7 @@ internal static class WindowsShellChecks
             var registrar = new WinRegistryMenu(classes);
             registrar.RegisterContextMenuAndAssociations(gui, cli);
             Check(Read(classes, ".zip") == "ExistingApp.Zip", "Default ZIP application is preserved");
-            foreach (string extension in new[] { ".larc", ".rar", ".zip", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz" })
+            foreach (string extension in new[] { ".larc", ".rar", ".zip", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz", ".iso" })
             {
                 string shell = $@"SystemFileAssociations\{extension}\shell";
                 Check(Read(classes, shell + @"\LunaArc\shell\04Here\command") == $"\"{gui}\" --shell-extract-here \"%1\"", "Extract Here: " + extension);
