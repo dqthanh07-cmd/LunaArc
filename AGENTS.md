@@ -8,7 +8,7 @@ Read relevant source, callers, project configuration and related `task/` notes b
 
 Discuss work in Vietnamese when appropriate; keep source comments, UI messages, CLI output and documentation in English. Do not reuse Android, signing, release or project-specific settings from LunaDL or other projects.
 
-The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git`. GitLab CI in `.gitlab-ci.yml` runs native Windows/Linux verification and exposes a manual promotion job that uses successful same-pipeline artifacts. It verifies Windows checksums, packages Linux, publishes immutable versioned package assets and creates a GitLab Release. Keep release version/tag variables synchronized with `Directory.Build.props`; never replace an existing release or package asset. Studio's Check for updates action reads the latest public GitLab Release metadata and opens its release page; it does not install binaries automatically. The repository must be publicly readable for anonymous update checks.
+The primary Git remote is `origin` at `https://github.com/dqthanh07-cmd/LunaArc.git`. GitHub Actions in `.github/workflows/build.yml` runs native Windows/Linux verification and publishes job artifacts. `.github/workflows/release.yml` manually promotes successful main-branch artifacts to an immutable GitHub Release after verifying Windows checksums and packaging Linux. Never replace an existing release. Studio's Check for updates action reads the latest public GitHub Release metadata and opens its release page; it does not install binaries automatically. The repository must be publicly readable for anonymous update checks.
 
 ## Architecture
 
@@ -23,7 +23,8 @@ The primary Git remote is `origin` at `https://gitlab.com/itmylifeex/lunaarc.git
 - `tests/LunaArc.StudioChecks`: headless Skia rendering and interaction checks for the actual Avalonia views, with PNG captures.
 - `installers`: self-contained publish scripts, versioned Windows portable ZIP/setup packaging, Inno Setup definition and CI-only installer lifecycle checks.
 - `branding`: logo and EULA; `native_libs`: optional-library notes, not an implemented native adapter.
-- `.gitlab-ci.yml`: native Windows/Linux build and verification pipelines, expiring job artifacts, and manual promotion of the exact successful pipeline outputs to GitLab Releases.
+- `.github/workflows/build.yml`: native Windows/Linux build, verification and expiring job artifacts.
+- `.github/workflows/release.yml`: manual promotion of the exact successful main-branch workflow artifacts to GitHub Releases.
 
 Current dependencies: SharpCompress 0.50.5, SharpZipLib 1.4.2 (encrypted ZIP writing), ZstdSharp.Port 0.8.7, LTRData DiscUtils ISO9660/UDF readers 1.0.90, Avalonia 11.1.3 and CommunityToolkit.Mvvm 8.2.2. Check `.csproj` for the actual versions. Upgrade only when needed by the task and verify affected APIs and archive fixtures.
 

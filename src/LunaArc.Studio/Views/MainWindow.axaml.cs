@@ -304,8 +304,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (!await Launcher.LaunchUriAsync(new Uri("https://gitlab.com/itmylifeex/lunaarc")) && Vm != null)
-                Vm.StatusMessage = "Could not open the project home page. Visit https://gitlab.com/itmylifeex/lunaarc";
+            if (!await Launcher.LaunchUriAsync(new Uri("https://github.com/dqthanh07-cmd/LunaArc")) && Vm != null)
+                Vm.StatusMessage = "Could not open the project home page. Visit https://github.com/dqthanh07-cmd/LunaArc";
         }
         catch (Exception ex)
         {
@@ -328,7 +328,7 @@ public partial class MainWindow : Window
 
             string notes = string.IsNullOrWhiteSpace(result.ReleaseNotes) ? "No release notes were provided." : result.ReleaseNotes;
             await ShowInformationAsync("Update available", $"LunaArc {result.LatestVersion} is available",
-                $"Installed version: {result.CurrentVersion.ToString(3)}\n\n{notes}\n\nThe GitLab release page will open after you close this message. Choose the package for your operating system there.");
+                $"Installed version: {result.CurrentVersion.ToString(3)}\n\n{notes}\n\nThe GitHub release page will open after you close this message. Choose the package for your operating system there.");
             if (!await Launcher.LaunchUriAsync(result.ReleasePage))
                 Vm.StatusMessage = $"Could not open the release page. Visit {result.ReleasePage}";
         }

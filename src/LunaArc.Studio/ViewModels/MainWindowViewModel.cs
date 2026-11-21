@@ -16,7 +16,7 @@ namespace LunaArc.Studio.ViewModels;
 public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     private readonly StandardArchiveHandler _backend = new();
-    private readonly GitLabUpdateChecker _updateChecker = new();
+    private readonly GitHubUpdateChecker _updateChecker = new();
     private readonly TempFileWatcher _liveWatcher = new();
     private FlatVfsArena? _currentArena;
     private LunaJobController? _activeJob;
@@ -131,7 +131,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         if (IsBusy) throw new InvalidOperationException("Wait for the current operation to finish before checking for updates.");
         IsBusy = true;
-        StatusMessage = "Checking GitLab for LunaArc updates...";
+        StatusMessage = "Checking GitHub for LunaArc updates...";
         try
         {
             Version assemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version ?? new Version(0, 0, 0);

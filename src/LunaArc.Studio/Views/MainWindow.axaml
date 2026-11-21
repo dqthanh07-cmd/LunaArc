@@ -65,7 +65,7 @@
                 <MenuItem Name="HelpMenu" Header="_Help">
                     <MenuItem Name="HelpTopicsMenu" Header="Help _topics" InputGesture="F1" Click="OnHelpTopicsClicked"/>
                     <MenuItem Name="CheckForUpdatesMenu" Header="Check for _updates..." Click="OnCheckForUpdatesClicked" />
-                    <MenuItem Name="HomePageMenu" Header="_Home page (GitLab)" Click="OnHomePageClicked" ToolTip.Tip="https://gitlab.com/itmylifeex/lunaarc" />
+                    <MenuItem Name="HomePageMenu" Header="_Home page (GitHub)" Click="OnHomePageClicked" ToolTip.Tip="https://github.com/dqthanh07-cmd/LunaArc" />
                     <Separator />
                     <MenuItem Name="AboutMenu" Header="_About LunaArc" Click="OnAboutClicked" />
                 </MenuItem>

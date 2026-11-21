@@ -1,9 +1,9 @@
-# Runs only on a disposable Windows GitLab CI runner: installs and removes test packages.
+# Runs only on a disposable Windows GitHub Actions runner: installs and removes test packages.
 [CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
-if ($env:GITLAB_CI -ne 'true' -or $env:OS -ne 'Windows_NT') {
-    throw 'Installer lifecycle tests run only on a disposable Windows GitLab CI runner.'
+if ($env:GITHUB_ACTIONS -ne 'true' -or $env:OS -ne 'Windows_NT') {
+    throw 'Installer lifecycle tests run only on a disposable Windows GitHub Actions runner.'
 }
 $projectRoot = Split-Path -Parent $PSScriptRoot
 [xml]$properties = Get-Content -LiteralPath (Join-Path $projectRoot 'Directory.Build.props') -Raw -Encoding UTF8

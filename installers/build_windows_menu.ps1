@@ -27,7 +27,7 @@ try {
     if ($env:LUNAARC_MENU_SIGNING_THUMBPRINT) {
         if ($env:LUNAARC_MENU_SIGNING_THUMBPRINT -notmatch '^[0-9a-fA-F]{40}$') { throw 'Invalid signing-certificate thumbprint.' }
         $certificate = Get-Item -LiteralPath ('Cert:/CurrentUser/My/' + $env:LUNAARC_MENU_SIGNING_THUMBPRINT)
-    } elseif ($env:GITLAB_CI -eq 'true') {
+    } elseif ($env:GITHUB_ACTIONS -eq 'true') {
         # Public preview builds get a disposable test signer. Never export its private key.
         $certificate = New-SelfSignedCertificate -Type Custom -Subject 'CN=LunaArc Shell Menu Preview' -KeyUsage DigitalSignature -CertStoreLocation 'Cert:/CurrentUser/My' -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}') -NotAfter (Get-Date).AddYears(1)
         $temporaryCertificate = $true

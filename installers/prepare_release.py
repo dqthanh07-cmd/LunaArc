@@ -1,4 +1,4 @@
-"""Prepare verified build outputs for GitLab Release promotion; never rebuild binaries."""
+"""Prepare verified build outputs for GitHub Release promotion; never rebuild binaries."""
 import hashlib
 import re
 import shutil
