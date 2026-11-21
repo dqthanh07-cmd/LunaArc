@@ -10,16 +10,16 @@ The source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaa
 
 The GitLab release series starts at **1.0.0** and carries forward the existing LunaArc feature set, previously versioned through 2.3.0. It includes estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. Earlier validation results are historical; new GitLab CI builds require account identity verification.
 
-| Edition | GitLab Release download (after first release) | Getting started |
+| Edition | Download | Getting started |
 | --- | --- | --- |
-| Windows x64 Setup | [Download installer](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Setup.exe) | Run the downloaded installer directly. |
-| Windows x64 Portable | [Download portable](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Windows-Portable.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
-| Linux x64 | [Download Linux](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/LunaArc-Linux-x64.tar.gz) | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
-| SHA-256 checksums | [Download checksums](https://gitlab.com/itmylifeex/lunaarc/-/releases/permalink/latest/downloads/SHA256SUMS.txt) | Verify all three packages. |
+| Windows x64 Setup | Available after first GitLab Release | Run the downloaded installer directly. |
+| Windows x64 Portable | [Download portable ZIP](https://gitlab.com/api/v4/projects/88556558/packages/generic/LunaArc-Windows-Portable/1.0.0-local-preview-20261121/LunaArc-Windows-Portable.zip) | Extract the ZIP into a folder, then run `LunaArc.exe`. |
+| Linux x64 | Available after first GitLab Release | Extract the TAR.GZ into a folder, then start `./LunaArc`. |
+| SHA-256 checksums | Available after first GitLab Release | Verify all three packages. |
 
-These stable links resolve after a GitLab Release is published. When CI is enabled, preview artifacts will be available from the [GitLab pipelines](https://gitlab.com/itmylifeex/lunaarc/-/pipelines) and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
+The Setup, Linux and checksum downloads become available after a GitLab Release is published. When CI is enabled, preview artifacts will be available from the [GitLab pipelines](https://gitlab.com/itmylifeex/lunaarc/-/pipelines) and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
 
-A Windows x64 managed-only portable preview for **1.0.0** is available: [download LunaArc portable ZIP](https://gitlab.com/api/v4/projects/88556558/packages/generic/LunaArc-Windows-Portable/1.0.0-local-preview-20261121/LunaArc-Windows-Portable.zip). The package is built locally while GitLab CI is blocked by account identity verification. It includes the GUI and CLI but not the native Windows 11 Explorer menu extension. SHA-256: `A1E3D347F3D062E1698E9E57581DF6674CFCA2BBA812A4B9159D9F30B35C050F`.
+The Windows x64 portable preview is built locally while GitLab CI is blocked by account identity verification. It includes the GUI and CLI but not the native Windows 11 Explorer menu extension. SHA-256: `A1E3D347F3D062E1698E9E57581DF6674CFCA2BBA812A4B9159D9F30B35C050F`.
 
 ## Projects
 
