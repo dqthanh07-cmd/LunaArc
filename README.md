@@ -8,7 +8,7 @@ The source repository is [LunaArc on GitHub](https://github.com/dqthanh07-cmd/Lu
 
 ## Download
 
-The GitHub release series starts at **1.0.0** and carries forward the existing LunaArc feature set. It includes ISO image browsing and extraction, estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. Release 1.0.0 was built and verified by GitHub Actions before its packages were published.
+The initial release, **1.0.0**, is currently the only published version. It includes ISO image browsing and extraction, estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. GitHub Actions built and verified this release before its packages were published.
 
 | Edition | Download | Getting started |
 | --- | --- | --- |
