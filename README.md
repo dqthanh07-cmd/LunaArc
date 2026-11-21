@@ -8,7 +8,7 @@ The source repository is [LunaArc on GitLab](https://gitlab.com/itmylifeex/lunaa
 
 ## Download
 
-Version **2.3.0** adds estimated free-space checks, progress by phase with measured throughput/ETA, and automatic final-file extraction for `.tar.gz.7z`. Includes authenticated LARC v2, LunaArc split sets, Nocturne Orbit and optional Windows 11 main-menu setup with explicit certificate consent. Previously verified Windows/Linux builds and package checks are historical; GitLab downloads become available after the first verified GitLab release.
+The GitLab release series starts at **1.0.0** and carries forward the existing LunaArc feature set, previously versioned through 2.3.0. It includes estimated free-space checks, phase progress with measured throughput/ETA, automatic final-file extraction for `.tar.gz.7z`, authenticated LARC v2, split sets, Nocturne Orbit and optional Windows 11 main-menu setup. Earlier validation results are historical; new GitLab CI builds require account identity verification.
 
 | Edition | GitLab Release download (after first release) | Getting started |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ Version **2.3.0** adds estimated free-space checks, progress by phase with measu
 
 These stable links resolve after a GitLab Release is published. When CI is enabled, preview artifacts will be available from the [GitLab pipelines](https://gitlab.com/itmylifeex/lunaarc/-/pipelines) and expire after one year. Linux Studio requires a graphical desktop and the system libraries listed under [Requirements](#requirements).
 
-A Windows x64 managed-only portable preview is available now: [download LunaArc portable ZIP](https://gitlab.com/api/v4/projects/88556558/packages/generic/LunaArc-Windows-Portable/2.3.0-public-preview-20261121/LunaArc-Windows-Portable.zip). This package was built locally because GitLab CI is currently blocked by account identity verification. It includes the GUI and CLI but not the native Windows 11 Explorer menu extension. SHA-256: `1E1322D35A5E8E989BB09E9B0A727BF7D358C22BD9CA5314A968206058F08075`.
+A Windows x64 managed-only portable preview for **1.0.0** is available: [download LunaArc portable ZIP](https://gitlab.com/api/v4/projects/88556558/packages/generic/LunaArc-Windows-Portable/1.0.0-local-preview-20261121/LunaArc-Windows-Portable.zip). The package is built locally while GitLab CI is blocked by account identity verification. It includes the GUI and CLI but not the native Windows 11 Explorer menu extension. SHA-256: `A1E3D347F3D062E1698E9E57581DF6674CFCA2BBA812A4B9159D9F30B35C050F`.
 
 ## Projects
 
